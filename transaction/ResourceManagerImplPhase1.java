@@ -1,7 +1,6 @@
 package transaction;
 
 import lockmgr.*;
-import transaction.TransactionAbortedException;
 import transaction.recovery.LoadFiles;
 import transaction.recovery.RecoveryManager;
 import transaction.logmgr.LogWriter;
@@ -22,8 +21,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-
-
+import java.nio.file.Files;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicBoolean;
 /** 
  * Resource Manager for the Distributed Travel Reservation System.
  * 
@@ -41,17 +43,20 @@ implements ResourceManager {
 	private static volatile AtomicInteger shuttingDown = new AtomicInteger();
 	private volatile AtomicInteger committedTrxns = new  AtomicInteger();
 	private volatile Integer enteredTxnsCount=0;
-	private static Boolean stopAndWait = new Boolean(false);
-	private static Boolean HashSetEmpty = new Boolean(true);
+	private static AtomicBoolean stopAndWait = new AtomicBoolean(false);
+	private static AtomicBoolean HashSetEmpty = new AtomicBoolean(true);
+	private static Boolean DieBeforeCommit = new Boolean(false);
+	private static Boolean DieAfterCommit = new Boolean(false);
 	private ExecutorService checkPointers ;
 	private Set<Callable<Integer>> callables;
 	private ExecutorService executor ;
+	private HashSet<Integer> abrtdTxns;
 
 	// Other Variables
 	private static final Object DUMMY = new Object();
 	private final int WRITE = 1;
 	private final int READ = 0;
-	private static final int CHECKPOINT_TRIGGER = 10;
+	private static final int CHECKPOINT_TRIGGER = 1;
 	private static final int SLEEPSHUTDOWN = 5000;
 
 	// Data Sets
@@ -118,6 +123,15 @@ implements ResourceManager {
 	//g) design the recoevey mechanism - impkemnt the abort/commit functions.
 	//h ) restart/startup functions - to read from the disk ,waht to read, perform recovery on startup.
 	//i) Add volatile to some variables
+	void checkAndCreateData()
+	{
+		Path path = Paths.get("data");
+		if(Files.notExists(path	))
+		{
+			File dir= new File("data");
+			dir.mkdir();
+		}
+	}
 
 	public ResourceManagerImpl() throws RemoteException {
 		System.out.println("starting constructor");
@@ -129,12 +143,14 @@ implements ResourceManager {
 		reservationTable = new ConcurrentHashMap<String, HashSet<Reservation>>();
 		reservedflights = new ConcurrentHashMap<String,Integer>();
 		executor = Executors.newSingleThreadExecutor();
+
 		//<----------UNDOING--------------------->
 		UndoIMTable = new ConcurrentHashMap<Integer,Stack<UndoIMLog>>();
 		//</----------UNDOING--------------------->
 
 		xidCounter = 1;
 		callables = new HashSet<Callable<Integer>>();
+		abrtdTxns = new HashSet<Integer>();
 
 		// How many threads do we want ?
 		// This is a configurable value. Need to set it to optimal value.
@@ -146,42 +162,44 @@ implements ResourceManager {
 		callables.add(new TableWriter((Object)reservationTable,"reservationTable"));
 		callables.add(new TableWriter((Object)reservedflights,"reservedFlights"));
 
+		checkAndCreateData();
 		try{
 			loadFiles();
 		}
 		catch(FileNotFoundException e){
-			System.out.println("Cannot find file/s: " + e.getMessage());
+			System.out.println("Cannot find file/s (Database probably does not exist only): " + e.getMessage());
 		}
 		System.out.println("Load files done/not done");		
 		try{
 			recover();
 		}
 		catch(FileNotFoundException e){
-			System.out.println("Failed in recover: "+ e.getMessage());
+			System.out.println("Nothing to recover"+ e.getMessage());
 		}
 		System.out.println("Recovery done");
-		
+
 		//TODO : why this?? synchronized (shuttingDown) {		
 		/*synchronized (stopAndWait) {
 			stopAndWait = Boolean.valueOf(false);
 			stopAndWait.notifyAll();
 		}*/
-		System.out.println("closing conbstructor");
+		System.out.println("closing constructor");
 	}
 
 
 	public void isValidTrxn(int xid)
-			throws InvalidTransactionException
+			throws InvalidTransactionException, TransactionAbortedException
 			{
 		//System.out.println("No of active transactions: " + activeTxns.size());
 		//System.out.println(xid + ": " + activeTxns.get(xid));
-		//System.out.println(activeTxns.containsKey(xid));
+		System.out.println("Current XID: " + xid);
+		System.out.println(abrtdTxns.toString());
+		if(abrtdTxns.contains(xid)){
+			throw new TransactionAbortedException(xid,"");
+		}
 		if(activeTxns.get(xid) == null){
-			System.out.println("Throwing the Invalid Txn Exception");
 			throw new InvalidTransactionException(xid,"");
 		}
-		System.out.println("Transaction is valid");
-
 		return ;
 
 			}
@@ -192,22 +210,28 @@ implements ResourceManager {
 		committedTrxns.set(0);
 		synchronized(HashSetEmpty)
 		{
-			HashSetEmpty=HashSetEmpty.valueOf(true);
+			HashSetEmpty.set(true);
 		}
+		
 		synchronized(enteredTxnsCount)
 		{
 			enteredTxnsCount=0;
 		}
+		
 		synchronized(stopAndWait)
 		{
-			stopAndWait=stopAndWait.valueOf(false);
+			stopAndWait.set(false);
+			
 			stopAndWait.notifyAll();
+			
 		}
+		
 
 	}
 
 	private void checkPoint (int tries) throws RemoteException
 	{
+		System.out.println("CHeckpoint begin");
 		boolean failed=false;
 		try
 		{
@@ -240,6 +264,7 @@ implements ResourceManager {
 		}
 		if(failed)checkPoint(tries+1);
 		LogWriter.flush();
+		System.out.println("CHeckpoint END");
 		return;
 		//executorService.shutdown();
 	}
@@ -248,8 +273,8 @@ implements ResourceManager {
 	{
 		synchronized(stopAndWait)
 		{
-			if(!stopAndWait){
-				stopAndWait=stopAndWait.valueOf(true);
+			if(!stopAndWait.get()){
+				stopAndWait.set(true);
 			}
 			else
 				return;
@@ -261,7 +286,7 @@ implements ResourceManager {
 		}
 		//wait for all transactions to get over. Sleep on the HashSetEmpty object.
 		synchronized(HashSetEmpty){
-			while(!HashSetEmpty)
+			while(!HashSetEmpty.get())
 			{
 				try{
 
@@ -280,10 +305,28 @@ implements ResourceManager {
 		//code for checkpointing
 
 		checkPoint(0);
+		RecoveryManager recoveryManager = new RecoveryManager();
+		try{
+			System.out.println("Doing cleanup");
+			recoveryManager.deleteLogs();
+			System.out.println("done cleanup");
+		}
+		catch(SecurityException e){
+			System.out.println("Security permission issues: "+e.getMessage());
+		}
+		catch(FileNotFoundException e){
+			System.out.println("PROBLEM WHILE DELETING LOGS");
+		}
+		catch(IllegalMonitorStateException e)
+		{
+				e.printStackTrace();e.getCause();
+		}
 		if(shuttingDown.get()>0)
 			System.exit(0);
+		
+		System.out.println("about to update variables");
 		updateCheckPointVariables();
-
+		System.out.println("Stop incoming ends");
 		return;
 	}
 
@@ -296,7 +339,7 @@ implements ResourceManager {
 			System.out.println("entering start==========");
 			synchronized(stopAndWait)
 			{
-				while(stopAndWait)
+				while(stopAndWait.get())
 				{
 					try{
 						System.out.println("waiting on stopAndWait");
@@ -321,14 +364,14 @@ implements ResourceManager {
 				System.out.println("SHOULD NOT REACH: XID DUPLICATE");
 			}
 			enteredTxnsCount++;
-			temp=xidCounter++;
+			temp = xidCounter++;
 		}
 
 		synchronized(HashSetEmpty)
 		{
 			activeTxns.put(temp,DUMMY);
 			System.out.println("tid assigned is "+temp);
-			HashSetEmpty=HashSetEmpty.valueOf(false);
+			HashSetEmpty.set(false);
 		}
 
 		//<----------UNDOING--------------------->
@@ -338,7 +381,7 @@ implements ResourceManager {
 		return (temp);
 	}
 
-	public void removeXID (int xid) throws InvalidTransactionException
+	public void removeXID (int xid) throws InvalidTransactionException, TransactionAbortedException
 	{
 		isValidTrxn(xid);
 		synchronized(activeTxns){
@@ -347,7 +390,7 @@ implements ResourceManager {
 			System.out.println("Done removing from hashmap");
 			if(activeTxns.size()==shuttingDown.get()){
 				System.out.println("active transactions are virtually empty");
-				HashSetEmpty=HashSetEmpty.valueOf(true);
+				HashSetEmpty.set(true);
 			}
 			System.out.println("Notifying");
 			synchronized(HashSetEmpty){
@@ -371,7 +414,16 @@ implements ResourceManager {
 		System.out.println("Committing");
 		// When xid is removed from the hashset , see if the hashset becomes equal to the shuttingDown.get() value -
 		// implies there are no more useful processes left. hence can shutdown the system.
-
+		
+		synchronized(DieBeforeCommit)
+		{
+			if(DieBeforeCommit)
+			{
+				dieNow();
+			}
+				
+		}
+		
 		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "COMMIT\n"));
 		try
 		{
@@ -382,6 +434,14 @@ implements ResourceManager {
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
 		LogWriter.flush();
+		synchronized(DieAfterCommit)
+		{
+			if(DieAfterCommit)
+			{
+				dieNow();
+			}
+				
+		}
 		removeXID(xid);
 		System.out.println("Done commiting=======");
 		return true;
@@ -496,6 +556,14 @@ implements ResourceManager {
 			InvalidTransactionException {
 		//When xid is removed from the hashset , see if the hashset becomes empty, if so notify the hashSetEmpty thread: Done in removeXID.
 		//<----------UNDOING--------------------->
+		
+		try {
+			isValidTrxn(xid);
+		} catch (TransactionAbortedException e1) {
+			System.out.println("FadddieXID type case, Abort is called as first");
+			return;
+		}
+		
 		Stack<UndoIMLog> undo = UndoIMTable.get(xid);
 		int retries=3;
 		UndoIMLog entry = null;
@@ -532,7 +600,12 @@ implements ResourceManager {
 		}
 		LogWriter.flush();
 		System.out.println(" Aborted=======");
-		removeXID(xid);
+	
+		try {
+			removeXID(xid);
+		} catch (TransactionAbortedException e) {
+			System.out.println("");
+		}
 		return;
 	}
 
@@ -1676,6 +1749,7 @@ implements ResourceManager {
 
 	public boolean dieNow() 
 			throws RemoteException {
+		LogWriter.flush();
 		System.exit(1);
 		return true; // We won't ever get here since we exited above;
 		// but we still need it to please the compiler.
@@ -1683,11 +1757,20 @@ implements ResourceManager {
 
 	public boolean dieBeforePointerSwitch() 
 			throws RemoteException {
+		synchronized(DieBeforeCommit)
+		{
+			DieBeforeCommit=DieBeforeCommit.valueOf(true);
+		}
 		return true;
 	}
 
 	public boolean dieAfterPointerSwitch() 
 			throws RemoteException {
+		synchronized(DieAfterCommit)
+		{
+			DieAfterCommit=DieAfterCommit.valueOf(true);
+		}
+			
 		return true;
 	}
 
@@ -1710,27 +1793,26 @@ implements ResourceManager {
 
 	public void recover() throws FileNotFoundException{
 		RecoveryManager recoveryManager = new RecoveryManager(flightTable,  carTable,  hotelTable, reservationTable,  reservedflights);
-		System.out.println("Recoveryt Manager instantiated");
-		if(recoveryManager.analyze()==false){
-			System.out.println("Failed during analyze");
+		System.out.println("Recovery Manager instantiated");
+		boolean flag = recoveryManager.analyze();
+		abrtdTxns = recoveryManager.getAbrtdTxns();
+		xidCounter = recoveryManager.getMAXid() + 1;
+		
+		if(flag==false){
+			System.out.println("No Need to recover");
 			return;
 		}
+		System.out.println("After calling get aborted");
+		System.out.println("ABorted Transactions");
+		for(int s : abrtdTxns){
+			System.out.println(s);
+		}
+		
 		System.out.println("Analyze phase done");
 		if(recoveryManager.redo()==false){
 			System.out.println("Failed during redo");
 			return;
 		}
 		System.out.println("REDO phase done");
-		try{
-		System.out.println("Doing cleanup");
-		recoveryManager.cleanup();
-		}
-		catch(SecurityException e){
-			System.out.println("Security permission issues: "+e.getMessage());
-		}
-		catch(FileNotFoundException e){
-			System.out.println("PROBLEM WHILE DELETING LOGS");
-			throw new FileNotFoundException();
-		}
 	}
 }

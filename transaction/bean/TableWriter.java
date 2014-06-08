@@ -19,19 +19,32 @@ public class TableWriter implements Callable<Integer> {
 	}
 
 	public Integer call() throws Exception{
+		OutputStream fileOut = null;
+		ObjectOutputStream out = null;
 		try
 		{
-			OutputStream fileOut = new FileOutputStream(fileName);
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			fileOut = new FileOutputStream("./data/"+fileName);
+			out = new ObjectOutputStream(fileOut);
 			out.writeObject(table);
-			out.close(); // required !
-			fileOut.close();
 		}
 		catch(IOException e)
 		{
-			System.out.println(" exception message"+e.getMessage());
+			System.out.println("the issue is here: exception message"+e.getMessage());
+			e.printStackTrace();
 			return 1;
 
+		}finally{
+			try{
+				if(out != null){
+					out.close(); //required !
+				}
+				if(fileOut != null){
+					fileOut.close();
+				}
+			}catch(IOException e){
+				System.out.println("Error in closing: "+e.getMessage());
+				return 1;
+			}
 		}
 
 		return 0;
