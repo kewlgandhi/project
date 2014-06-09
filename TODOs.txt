@@ -1,0 +1,20 @@
+
+TODOS
+1) Change the logmanager to a an object for every resurce manager.- it should accept the log file name as argument in constructor.
+2) Change the receovery manger to use the logfile appropriately.
+3) Resource manager constructor needs to accept the name of the logfile accoridingly.
+4) TM should get the references of the resource managers.
+5) TM should have its own log manager. The xid generation of the TM is dependent onthe logs.
+6) Design logs for TM.==format , what operations to log.
+7) TM needs routines like getStatusOfXid , and also setters of status of individual RMs. Like set RM1 status to "prepared " in TM.
+8) Catch invalid, Aborted transaction in every routine , and invoke Wc.abort if any of the exceptions are thrown. Wc.abort should make a request for TM.abort , which will intrun invoke abort on the enlisted resource managers.
+9) on Recovery :
+	The Resource manager has to ,on receovery make a list of 
+	a)committed transactions : Redo them
+	b) Aborted trasanctions : No prepare. So ignore them
+	c) Incomplee trasnctions : Seen the prepared log ut dont know what to do- so query th TM , and move them either to committted or aborted. Then perform redo onluy for committed.
+10) On recovery of TM :
+	Check the scripts to see if they need to be recovred. Meaning if thee is a script which demands recovery of committed and aborted also , then recover them all.. Else recver only incomplete ones.
+11) 
+
+
