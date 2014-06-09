@@ -2,7 +2,6 @@ package transaction.recovery;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,23 +17,34 @@ public class RecoveryManager {
 	RedoHotel redoHotel;
 	RedoReservation redoReservation;
 	RedoReservedFlights redoReservedFlights;
-	private HashSet<Integer> comtdTxns;
-	private HashSet<Integer> abrtdTxns;
+	
+	private ConcurrentHashMap<Integer, Object> comtdTxns;
+	private ConcurrentHashMap<Integer, Object> abrtdTxns;
+	private ConcurrentHashMap<Integer, Object> ongngTxns;
+	private ConcurrentHashMap<Integer, Object> prprdTxns;
+	
+	private final Object DUMMY = null;
+	
 	private int MAXid = 0;
 	private String logFile;
-	public HashSet<Integer> getAbrtdTxns() {
-		System.out.println("ABorted Transactions");
-		for(int s : abrtdTxns){
-			System.out.println(s);
-		}
+	LogReader logReader;
+
+	
+	public ConcurrentHashMap<Integer, Object> getAbrtdTxns() {
 		return abrtdTxns;
 	}
 
+	public ConcurrentHashMap<Integer, Object> getComtdTxns() {
+		return comtdTxns;
+	}
+	
+	public ConcurrentHashMap<Integer, Object> getPrprdTxns() {
+		return prprdTxns;
+	}
+	
 	public int getMAXid() {
 		return MAXid;
 	}
-
-	LogReader logReader;
 	
 	public RecoveryManager(String fileName){
 		logFile = fileName;
@@ -52,8 +62,10 @@ public class RecoveryManager {
 
 	public boolean analyze() throws FileNotFoundException{
 		// Load Undo Redo Logs
-		comtdTxns = new HashSet<Integer>();
-		abrtdTxns = new HashSet<Integer>();
+		comtdTxns = new ConcurrentHashMap<Integer, Object>();
+		abrtdTxns = new ConcurrentHashMap<Integer, Object>();
+		ongngTxns = new ConcurrentHashMap<Integer, Object>();
+		prprdTxns = new ConcurrentHashMap<Integer, Object>();
 		logReader.loadFile();
 		System.out.println("Loaded undo-redo log file");
 		// Create HashSet of Committed Transactions
@@ -68,25 +80,32 @@ public class RecoveryManager {
 				System.out.println("I see a commit");
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
-				comtdTxns.add(XID);
-				abrtdTxns.remove(XID);
+				comtdTxns.put(XID, DUMMY);
+				prprdTxns.remove(XID);
 				MAXid = (XID>MAXid)?XID:MAXid;
 			}
 			else if(nextLine.contains("ABORT")){
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
-				abrtdTxns.add(XID);
+				abrtdTxns.put(XID,DUMMY);
+				prprdTxns.remove(XID);
 				MAXid = (XID>MAXid)?XID:MAXid;
+			}
+			else if(nextLine.contains("PREPARE")){
+				String[] xid = nextLine.split(" ");
+				int XID = Integer.parseInt(xid[0]);
+				ongngTxns.remove(XID);
+				prprdTxns.put(XID, DUMMY);
 			}
 			else {
 				String[] xid = nextLine.split("@#@");
 				int XID = Integer.parseInt(xid[0]);
-				abrtdTxns.add(XID);
+				ongngTxns.put(XID,DUMMY);
 				MAXid = (XID>MAXid)?XID:MAXid;
 			}
 			nextLine = logReader.nextLine();
 		}
-
+		abrtdTxns.putAll(ongngTxns);
 		if(comtdTxns.size()==0)return false;
 		logReader.close();
 		return true;
@@ -227,4 +246,5 @@ public class RecoveryManager {
 			}
 		return true;
 	}
+
 }

@@ -37,7 +37,6 @@ extends java.rmi.server.UnicastRemoteObject
 implements ResourceManager {
 
 	//Book keeping and other variables
-	//private static Logger log = Logger.getLogger(ResourceManagerImpl.class);
 	private ConcurrentHashMap<Integer,Object> activeTxns;
 	private LockManager lockManager;
 	private volatile AtomicInteger shuttingDown = new AtomicInteger();
@@ -53,7 +52,7 @@ implements ResourceManager {
 	private HashSet<Integer> abrtdTxns;
 	private LogWriter logWriter;
 	private String logFile;
-
+ 
 	// Other Variables
 	private static final Object DUMMY = new Object();
 	private final int WRITE = 1;
