@@ -234,6 +234,7 @@ public class Client {
 		    Throwable retExc = null;
 		    try {
 			retVal = method.invoke(wc, params);
+			
 			System.out.println("[" + id + "] " + methodName + " returned: " + retVal);
 		    } catch (IllegalAccessException e) {
 			System.err.println("[" + id + "] " + methodName + " got IllegalAccessException: " + e);
