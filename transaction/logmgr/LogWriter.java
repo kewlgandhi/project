@@ -5,19 +5,26 @@ import java.io.IOException;
 
 public class LogWriter {
 	
-	private static FileWriter fw;
-	
-	static{
-		try {
-			System.out.println("Creating UNDI-REDO log file");
-			fw = new FileWriter("./data/undo-redo.log");
-		} catch (IOException e) {
-			System.out.println("Error creating the log file");
-		}
-	}
+	private String fileName = null;
+	private FileWriter fw;
 
 	
-	public static void write(String msg){
+	public LogWriter(String fileName){
+		this.fileName = fileName;
+	}
+	
+	
+	public void loadFile(){
+		System.out.println("Creating Redo logs for "+ fileName);
+		try {
+			fw = new FileWriter("./data/"+fileName);
+		} catch (IOException e) {
+			System.out.println("Error creating Redo log file "+ fileName);
+			e.printStackTrace();
+		}
+	}
+	
+	public void write(String msg){
 		try {
 			fw.write(msg);
 		} catch (IOException e) {
@@ -25,7 +32,7 @@ public class LogWriter {
 		}
 	}
 	
-	public static void flush(){
+	public void flush(){
 		try {
 			fw.flush();
 			System.out.println("Flushed the disk logs");
@@ -36,7 +43,7 @@ public class LogWriter {
 		}
 	}
 	
-	public static void close(){
+	public void close(){
 		try {
 			fw.close();
 		} catch (IOException e) {

@@ -8,14 +8,19 @@ import java.io.IOException;
 public class LogReader {
 
 	private BufferedReader fr;
+	private String fileName;
+	
+	public LogReader(String fileName){
+		this.fileName = fileName;
+	}
 
 	public void loadFile() throws FileNotFoundException{
 		System.out.println("Trying to load undo redo logs");
-		fr = new BufferedReader(new FileReader("./data/undo-redo.log"));
+		fr = new BufferedReader(new FileReader("./data/"+fileName));
 		if(fr == null){
 			System.out.println("fr is null");
 		}
-		System.out.println("undo redo logs LOADED");
+		System.out.println("Redo logs loaded: "+fileName);
 	}
 
 	public String nextLine(){
@@ -23,7 +28,7 @@ public class LogReader {
 		try {
 			line = fr.readLine();
 		} catch (IOException e) {
-			System.out.println("Error in writing the logs");
+			System.out.println("Error in writing the logs "+fileName);
 		}
 		return line;
 	}
@@ -33,7 +38,7 @@ public class LogReader {
 		try {
 			fr.close();
 		} catch (IOException e) {
-			System.out.println("Error in closing the file");
+			System.out.println("Error in closing the file "+fileName);
 		}
 	}
 

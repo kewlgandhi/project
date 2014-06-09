@@ -40,17 +40,19 @@ implements ResourceManager {
 	//private static Logger log = Logger.getLogger(ResourceManagerImpl.class);
 	private ConcurrentHashMap<Integer,Object> activeTxns;
 	private LockManager lockManager;
-	private static volatile AtomicInteger shuttingDown = new AtomicInteger();
+	private volatile AtomicInteger shuttingDown = new AtomicInteger();
 	private volatile AtomicInteger committedTrxns = new  AtomicInteger();
 	private volatile Integer enteredTxnsCount=0;
-	private static AtomicBoolean stopAndWait = new AtomicBoolean(false);
-	private static AtomicBoolean HashSetEmpty = new AtomicBoolean(true);
-	private static Boolean DieBeforeCommit = new Boolean(false);
-	private static Boolean DieAfterCommit = new Boolean(false);
+	private AtomicBoolean stopAndWait = new AtomicBoolean(false);
+	private AtomicBoolean HashSetEmpty = new AtomicBoolean(true);
+	private Boolean DieBeforeCommit = new Boolean(false);
+	private Boolean DieAfterCommit = new Boolean(false);
 	private ExecutorService checkPointers ;
 	private Set<Callable<Integer>> callables;
 	private ExecutorService executor ;
 	private HashSet<Integer> abrtdTxns;
+	private LogWriter logWriter;
+	private String logFile;
 
 	// Other Variables
 	private static final Object DUMMY = new Object();
@@ -186,6 +188,10 @@ implements ResourceManager {
 		System.out.println("closing constructor");
 	}
 
+	public void setLogFile(String fileName){
+		logFile = fileName;
+		
+	}
 
 	public void isValidTrxn(int xid)
 			throws InvalidTransactionException, TransactionAbortedException
