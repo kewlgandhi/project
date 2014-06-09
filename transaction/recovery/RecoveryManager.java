@@ -21,7 +21,7 @@ public class RecoveryManager {
 	private HashSet<Integer> comtdTxns;
 	private HashSet<Integer> abrtdTxns;
 	private int MAXid = 0;
-
+	private String logFile;
 	public HashSet<Integer> getAbrtdTxns() {
 		System.out.println("ABorted Transactions");
 		for(int s : abrtdTxns){
@@ -36,17 +36,18 @@ public class RecoveryManager {
 
 	LogReader logReader;
 	
-	public RecoveryManager(){
-		
+	public RecoveryManager(String fileName){
+		logFile = fileName;
 	}
 
-	public RecoveryManager(ConcurrentHashMap<String, Flight> flightTable, ConcurrentHashMap<String, Car> carTable, ConcurrentHashMap<String, Hotels> hotelTable, ConcurrentHashMap<String, HashSet<Reservation>> reservationTable, ConcurrentHashMap<String,Integer> reservedflights){
+	public RecoveryManager(ConcurrentHashMap<String, Flight> flightTable, ConcurrentHashMap<String, Car> carTable, ConcurrentHashMap<String, Hotels> hotelTable, ConcurrentHashMap<String, HashSet<Reservation>> reservationTable, ConcurrentHashMap<String,Integer> reservedflights, String fileName){
 		redoCar = new RedoCar(carTable);
 		redoFlight = new RedoFlight(flightTable);
 		redoHotel = new RedoHotel(hotelTable);
 		redoReservation = new RedoReservation(reservationTable);
 		redoReservedFlights = new RedoReservedFlights(reservedflights);
-		logReader = new LogReader();
+		logFile = fileName;
+		logReader = new LogReader(fileName);
 	}
 
 	public boolean analyze() throws FileNotFoundException{
@@ -220,7 +221,7 @@ public class RecoveryManager {
 	}
 
 	public boolean deleteLogs() throws FileNotFoundException, SecurityException{
-			File f = new File("./data/undo-redo.log"); 
+			File f = new File("./data/"+logFile); 
 			if(f.exists()){
 				f.delete();
 			}
