@@ -11,7 +11,7 @@ import java.util.*;
  * instead of doing the things itself.
  */
 
-public class WorkflowControllerImpl
+public class WorkflowControllerImpl_sooi
     extends java.rmi.server.UnicastRemoteObject
     implements WorkflowController {
 
@@ -69,7 +69,7 @@ public class WorkflowControllerImpl
      */
 
     
-    public WorkflowControllerImpl() throws RemoteException {
+    public WorkflowControllerImpl_sooi() throws RemoteException {
 	flightcounter = 0;
 	flightprice = 0;
 	carscounter = 0;
