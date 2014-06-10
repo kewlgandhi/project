@@ -18,11 +18,11 @@ public class WorkflowControllerImpl_sooi
     protected int flightcounter, flightprice, carscounter, carsprice, roomscounter, roomsprice; 
     protected int xidCounter;
     
-    protected ResourceManager rmFlights = null;
-    protected ResourceManager rmRooms = null;
-    protected ResourceManager rmCars = null;
-    protected ResourceManager rmCustomers = null;
-    protected TransactionManager tm = null;
+    protected ResourceManagerImpl rmFlights = null;
+    protected ResourceManagerImpl rmRooms = null;
+    protected ResourceManagerImpl rmCars = null;
+    protected ResourceManagerImpl rmCustomers = null;
+    protected TransactionManagerImpl tm = null;
 
     public static void main(String args[]) {
 	System.setSecurityManager(new RMISecurityManager());
@@ -95,7 +95,15 @@ public class WorkflowControllerImpl_sooi
     // TRANSACTION INTERFACE
     public int start()
 	throws RemoteException {
-	return (xidCounter++);
+    	    	
+    	try{
+    		return (tm.start());
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /**
      * Commit transaction.
@@ -111,8 +119,16 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException, 
 	       InvalidTransactionException {
-	System.out.println("Committing");
-	return true;
+	System.out.println("Calling commit  at WC");
+		
+		try{
+			return(tm.commit(xid));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+	
     }
     /**
      * Abort transaction.
@@ -125,7 +141,14 @@ public class WorkflowControllerImpl_sooi
     public void abort(int xid)
 	throws RemoteException, 
                InvalidTransactionException {
-	return;
+    	try{
+			return(tm.abort(xid));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /**
      * Add seats to a flight.  In general this will be used to create
@@ -149,9 +172,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	flightcounter += numSeats;
-	flightprice = price;
-	return true;
+    	try{
+    		return(rmFlights.addFlight(xid, flightNum, numSeats, price));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /**
      * Delete an entire flight.
@@ -169,9 +197,15 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	flightcounter = 0;
-	flightprice = 0;
-	return true;
+       	try{
+       		return(rmFlights.deleteFlight(xid, flightNum));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
+	
     }
     /**
      * Add rooms to a location.
@@ -190,9 +224,13 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	roomscounter += numRooms;
-	roomsprice = price;
-	return true;
+     	try{
+     		return(rmRooms.addRooms(xid, location, numRooms, price));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
     }
     /**
      * Delete rooms from a location.
@@ -212,9 +250,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	roomscounter = 0;
-	roomsprice = 0;
-	return true;
+    	try{
+    		return(rmRooms.deleteRooms(xid, location, numRooms));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+
     }
     /**
      * Add cars to a location.
@@ -233,9 +276,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	carscounter += numCars;
-	carsprice = price;
-	return true;
+    	try{
+    		return(rmCars.addCars(xid, location, numCars, price));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+   	
     }
     /**
      * Delete cars from a location.
@@ -254,9 +302,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	carscounter = 0;
-	carsprice = 0;
-	return true;
+    	try{
+    		return(rmCars.deleteCars(xid, location, numCars));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	  
     }
     /**
      * Add a new customer to database.  Should return success if
@@ -274,7 +327,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return true;
+    	try{
+    		return(rmCustomers.newCustomer(xid, custName));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+	
     }
     /**
      * Delete this customer and un-reserve associated reservations.
@@ -291,7 +351,14 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return true;
+    	try{
+    		return(rmCustomers.deleteCustomer(xid, custName));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
 
 
@@ -312,49 +379,98 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return flightcounter;
+    	try{
+    		return(rmFlights.queryFlight(xid, flightNum));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /** Return the price of a seat on this flight. Return -1 if flightNum==null or doesn't exist.*/
     public int queryFlightPrice(int xid, String flightNum)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return flightprice;
+    	try{
+    		return(rmFlights.queryFlightPrice(xid, flightNum));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /** Return the number of rooms available at a location. */
     public int queryRooms(int xid, String location)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return roomscounter;
+    	try{
+    		return(rmRooms.queryRooms(xid, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
     /** Return the price of rooms at this location. */
     public int queryRoomsPrice(int xid, String location)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return roomsprice;
+    	try{
+    		return (rmRooms.queryRoomsPrice(xid, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+	
     }
     /** Return the number of cars available at a location. */
     public int queryCars(int xid, String location)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return carscounter;
+    	try{
+    		return(rmCars.queryCars(xid, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    
     }
     /** Return the price of rental cars at this location. */
     public int queryCarsPrice(int xid, String location)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return carsprice;
+    	try{
+    		return(rmCars.queryCarsPrice(xid, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    
     }
     /** Return the total price of all reservations held for a customer. Return -1 if custName==null or doesn't exist.*/
     public int queryCustomerBill(int xid, String custName)
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	return 0;
+    	try{
+    		return(rmCustomers.queryCustomerBill(xid, custName));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return 0;
+    	}
+    	
     }
 
 
@@ -375,24 +491,47 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	flightcounter--;
-	return true;
+    	try{
+    		return(rmFlights.reserveFlight(xid, custName, flightNum));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    	 return true;
     }
     /** Reserve a car for this customer at the specified location. */
     public boolean reserveCar(int xid, String custName, String location) 
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	carscounter--;
-	return true;
+    	try{
+    		return(rmCars.reserveCar(xid, custName, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    return true;
     }
     /** Reserve a room for this customer at the specified location. */
     public boolean reserveRoom(int xid, String custName, String location) 
 	throws RemoteException, 
 	       TransactionAbortedException,
 	       InvalidTransactionException {
-	roomscounter--;
-	return true;
+    	try{
+    		return(rmRooms.reserveRoom(xid, custName, location));
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    	catch(TransactionAbortedException e)
+    	{
+    		tm.abort(xid);
+    		throw new TransactionAbortedException(Xid,"aborted at one of the locales . so undoing everything");
+       	}
+    	 return true;
     }
     /**
      * Reserve an entire itinerary on behalf of this customer.
@@ -413,7 +552,28 @@ public class WorkflowControllerImpl_sooi
         throws RemoteException,
 	TransactionAbortedException,
 	InvalidTransactionException {
-	return true;
+    	boolean result=true;
+    	try{
+    		
+    		for(Object flightNum: flightNumList)
+    					result&=rmFlights.reserveFlight(xid, custName,(String) flightNum);
+    			
+    		if(needCar)
+    			result&=rmCars.reserveCar(xid, custName, location);
+    		
+    		if(needRoom)
+    			result&=rmRooms.reserveRoom(xid, custName, location);
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    	catch(TransactionAbortedException e)
+    	{
+    		tm.abort(xid);
+    		throw new TransactionAbortedException(Xid,"aborted at one of the locales . so undoing everything");
+       	}
+    	 return result;
     }
 
     // TECHNICAL/TESTING INTERFACE
@@ -439,24 +599,24 @@ public class WorkflowControllerImpl_sooi
 
 	try {
 	    rmFlights =
-		(ResourceManager)Naming.lookup(rmiPort +
-					       ResourceManager.RMINameFlights);
+		(ResourceManagerImpl)Naming.lookup(rmiPort +
+				ResourceManager.RMINameFlights);
 	    System.out.println("WC bound to RMFlights");
 	    rmRooms =
-		(ResourceManager)Naming.lookup(rmiPort +
-					       ResourceManager.RMINameRooms);
+		(ResourceManagerImpl)Naming.lookup(rmiPort +
+				ResourceManager.RMINameRooms);
 	    System.out.println("WC bound to RMRooms");
 	    rmCars =
-		(ResourceManager)Naming.lookup(rmiPort +
-					       ResourceManager.RMINameCars);
+		(ResourceManagerImpl)Naming.lookup(rmiPort +
+				ResourceManager.RMINameCars);
 	    System.out.println("WC bound to RMCars");
 	    rmCustomers =
-		(ResourceManager)Naming.lookup(rmiPort +
-					       ResourceManager.RMINameCustomers);
+		(ResourceManagerImpl)Naming.lookup(rmiPort +
+				ResourceManager.RMINameCustomers);
 	    System.out.println("WC bound to RMCustomers");
 	    tm =
-		(TransactionManager)Naming.lookup(rmiPort +
-						  TransactionManager.RMIName);
+		(TransactionManagerImpl)Naming.lookup(rmiPort +
+				TransactionManager.RMIName);
 	    System.out.println("WC bound to TM");
 	} 
 	catch (Exception e) {
@@ -536,7 +696,39 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieRMAfterEnlist(String who)
 	throws RemoteException {
-	return true;
+    	 	if (who.equals(ResourceManager.RMINameFlights) ){
+    		    try {
+    			rmFlights.dieAfterEnlist();
+    		    } catch (RemoteException e) {
+    		    	return false;
+    		    }
+    		    return true;
+    		}
+    		if (who.equals(ResourceManager.RMINameRooms) ) {
+    		    try {
+    			rmRooms.dieAfterEnlist();
+    		    } catch (RemoteException e) {
+    		    	return false;
+    		    }
+    		    return true;
+    		}
+    		if (who.equals(ResourceManager.RMINameCars) ) {
+    		    try {
+    			rmCars.dieAfterEnlist();
+    		    } catch (RemoteException e) {
+    		    	return false;
+    		    }
+    		    return true;
+    		}
+    		if (who.equals(ResourceManager.RMINameCustomers) ) {
+    		    try {
+    			rmCustomers.dieAfterEnlist();
+    		    } catch (RemoteException e) {
+    		    	return false;
+    		    }
+    		    return true;
+    		}
+       	
     } /**
      * Sets a flag so that the RM fails when it next tries to prepare,
      * but before it gets a chance to save the update list to disk.
@@ -548,7 +740,38 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieRMBeforePrepare(String who)
 	throws RemoteException {
-	return true;
+    	if (who.equals(ResourceManager.RMINameFlights) ){
+		    try {
+			rmFlights.dieBeforePrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameRooms) ) {
+		    try {
+			rmRooms.dieBeforePrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCars) ) {
+		    try {
+			rmCars.dieBeforePrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCustomers) ) {
+		    try {
+			rmCustomers.dieBeforePrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
     }
     /**
      * Sets a flag so that the RM fails when it next tries to prepare:
@@ -562,7 +785,38 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieRMAfterPrepare(String who)
 	throws RemoteException {
-	return true;
+    	if (who.equals(ResourceManager.RMINameFlights) ){
+		    try {
+			rmFlights.dieAfterPrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameRooms) ) {
+		    try {
+			rmRooms.dieAfterPrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCars) ) {
+		    try {
+			rmCars.dieAfterPrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCustomers) ) {
+		    try {
+			rmCustomers.dieAfterPrepare();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
     }
     /**
      * Sets a flag so that the TM fails after it has received
@@ -575,7 +829,15 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieTMBeforeCommit()
 	throws RemoteException {
-	return true;
+    	
+    	try{
+    		tm.dieBeforeCommit();
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    	return true;
     }
     /**
      * Sets a flag so that the TM fails right after it logs
@@ -587,7 +849,14 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieTMAfterCommit()
 	throws RemoteException {
-	return true;
+    	try{
+    		tm.dieAfterCommit();
+    	}
+    	catch(RemoteException e)
+    	{
+    		return false;
+    	}
+    	return true;
     }
     /**
      * Sets a flag so that the RM fails when it is told by the TM to
@@ -601,7 +870,38 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieRMBeforeCommit(String who)
 	throws RemoteException {
-	return true;
+    	if (who.equals(ResourceManager.RMINameFlights) ){
+		    try {
+			rmFlights.dieBeforeCommit();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameRooms) ) {
+		    try {
+			rmRooms.dieBeforeCommit();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCars) ) {
+		    try {
+			rmCars.dieBeforeCommit();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCustomers) ) {
+		    try {
+			rmCustomers.dieBeforeCommit();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
     }
     /**
      * Sets a flag so that the RM fails when it is told by the TM to
@@ -615,6 +915,37 @@ public class WorkflowControllerImpl_sooi
      */
     public boolean dieRMBeforeAbort(String who)
 	throws RemoteException {
-	return true;
+    	if (who.equals(ResourceManager.RMINameFlights) ){
+		    try {
+			rmFlights.dieBeforeAbort();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameRooms) ) {
+		    try {
+			rmRooms.dieBeforeAbort();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCars) ) {
+		    try {
+			rmCars.dieBeforeAbort();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
+		if (who.equals(ResourceManager.RMINameCustomers) ) {
+		    try {
+			rmCustomers.dieBeforeAbort();
+		    } catch (RemoteException e) {
+		    	return false;
+		    }
+		    return true;
+		}
     }
 }
