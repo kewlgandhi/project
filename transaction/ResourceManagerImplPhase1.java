@@ -190,7 +190,7 @@ implements ResourceManager {
 
 	public void setLogFile(String fileName){
 		logFile = fileName;
-		
+		logWriter = new LogWriter(fileName);
 	}
 
 	public void isValidTrxn(int xid)
@@ -269,7 +269,7 @@ implements ResourceManager {
 
 		}
 		if(failed)checkPoint(tries+1);
-		LogWriter.flush();
+		logWriter.flush();
 		System.out.println("CHeckpoint END");
 		return;
 		//executorService.shutdown();
@@ -430,7 +430,7 @@ implements ResourceManager {
 				
 		}
 		
-		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "COMMIT\n"));
+		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "COMMIT\n", logWriter));
 		try
 		{
 			returnVal.get();
@@ -439,7 +439,7 @@ implements ResourceManager {
 		{
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
-		LogWriter.flush();
+		logWriter.flush();
 		synchronized(DieAfterCommit)
 		{
 			if(DieAfterCommit)
@@ -595,7 +595,7 @@ implements ResourceManager {
 			undo.pop();
 		}
 		//</----------UNDOING--------------------->
-		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "ABORT\n"));
+		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "ABORT\n", logWriter));
 		try
 		{
 			returnVal.get();
@@ -604,7 +604,7 @@ implements ResourceManager {
 		{
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
-		LogWriter.flush();
+		logWriter.flush();
 		System.out.println(" Aborted=======");
 	
 		try {
@@ -685,7 +685,7 @@ implements ResourceManager {
 		undo.push(logRec);
 		//</----------UNDOING--------------------->
 
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -730,7 +730,7 @@ implements ResourceManager {
 		//</----------UNDOING--------------------->
 
 		logMsg.append(xid).append("@#@").append("Flights@#@").append(flightNum).append("@#@@#@DELETE\n");
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -807,7 +807,7 @@ implements ResourceManager {
 			undo.push(logRec);
 			//</----------UNDOING--------------------->
 
-			executor.execute(new VariableLogger(logMsg.toString()));
+			executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 			return true;	
 		}catch (DeadlockException e) {
 			abort(xid);
@@ -876,7 +876,7 @@ implements ResourceManager {
 				// should not happen ... if it happens return false.
 				return false;
 			}
-			executor.execute(new VariableLogger(logMsg.toString()));
+			executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 			return true;
 
 		}catch (DeadlockException e) {
@@ -961,7 +961,7 @@ implements ResourceManager {
 			abort(xid);
 			throw new TransactionAbortedException(xid, "Transaction aborted for unknown reasons" + "MSG: " + e.getMessage());
 		}
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -1010,7 +1010,7 @@ implements ResourceManager {
 			abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -1574,7 +1574,7 @@ implements ResourceManager {
 		//</----------UNDOING--------------------->
 
 		logMsg.append(xid).append("@#@").append("Flights@#@").append(flightNum).append("@#@").append("NumAvail@#@").append(avail).append("@#@").append(avail - 1).append("\n");
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -1648,7 +1648,7 @@ implements ResourceManager {
 		logMsg.append(xid).append("@#@").append("Reservations@#@").append(newReservation.toString()).append("@#@@#@INSERT\n");
 		data.setNumAvail(numCarsAvail - 1);
 		logMsg.append(xid).append("@#@").append("Cars@#@").append(location).append("@#@").append("NumAvail@#@").append(numCarsAvail).append("@#@").append(numCarsAvail - 1).append("\n");
-		executor.execute(new VariableLogger(logMsg.toString()));
+		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 		return true;
 	}
 
@@ -1717,7 +1717,7 @@ implements ResourceManager {
 			logMsg.append(xid).append("@#@").append("Reservations@#@").append(newReservation.toString()).append("@#@@#@INSERT\n");
 			data.setNumAvail(numRoomsAvail - 1);
 			logMsg.append(xid).append("@#@").append("Rooms@#@").append(location).append("@#@").append("NumAvail@#@").append(numRoomsAvail).append("@#@").append(numRoomsAvail - 1).append("\n");
-			executor.execute(new VariableLogger(logMsg.toString()));
+			executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 			return true;
 		}
 		catch (DeadlockException e) {
@@ -1755,7 +1755,7 @@ implements ResourceManager {
 
 	public boolean dieNow() 
 			throws RemoteException {
-		LogWriter.flush();
+		logWriter.flush();
 		System.exit(1);
 		return true; // We won't ever get here since we exited above;
 		// but we still need it to please the compiler.
