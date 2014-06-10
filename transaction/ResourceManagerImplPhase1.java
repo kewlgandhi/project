@@ -311,7 +311,7 @@ implements ResourceManager {
 		//code for checkpointing
 
 		checkPoint(0);
-		RecoveryManager recoveryManager = new RecoveryManager();
+		RecoveryManager recoveryManager = new RecoveryManager(logFile);
 		try{
 			System.out.println("Doing cleanup");
 			recoveryManager.deleteLogs();
@@ -1798,7 +1798,7 @@ implements ResourceManager {
 	}
 
 	public void recover() throws FileNotFoundException{
-		RecoveryManager recoveryManager = new RecoveryManager(flightTable,  carTable,  hotelTable, reservationTable,  reservedflights);
+		RecoveryManager recoveryManager = new RecoveryManager(flightTable,  carTable,  hotelTable, reservationTable,  reservedflights, logFile);
 		System.out.println("Recovery Manager instantiated");
 		boolean flag = recoveryManager.analyze();
 		abrtdTxns = recoveryManager.getAbrtdTxns();
