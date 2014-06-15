@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ResourceManagerImplPhase1 
 extends java.rmi.server.UnicastRemoteObject
-implements ResourceManager {
+ {
 
 	//Book keeping and other variables
 	private ConcurrentHashMap<Integer,Object> activeTxns;
@@ -49,7 +49,7 @@ implements ResourceManager {
 	private ExecutorService checkPointers ;
 	private Set<Callable<Integer>> callables;
 	private ExecutorService executor ;
-	private HashSet<Integer> abrtdTxns;
+	private ConcurrentHashMap<Integer, Object> abrtdTxns;
 	private LogWriter logWriter;
 	private String logFile;
  
@@ -92,7 +92,8 @@ implements ResourceManager {
 
 		String rmiName = System.getProperty("rmiName");
 		if (rmiName == null || rmiName.equals("")) {
-			rmiName = ResourceManager.DefaultRMIName;
+//			rmiName = ResourceManager.DefaultRMIName;
+			rmiName = "RM";
 		}
 
 		String rmiRegPort = System.getProperty("rmiRegPort");
@@ -101,7 +102,7 @@ implements ResourceManager {
 		}
 
 		try {
-			ResourceManagerImpl obj = new ResourceManagerImpl();
+			ResourceManagerImplPhase1 obj = new ResourceManagerImplPhase1();
 			Naming.rebind(rmiName, obj);
 			System.out.println("RM bound");
 		} 
@@ -151,7 +152,7 @@ implements ResourceManager {
 
 		xidCounter = 1;
 		callables = new HashSet<Callable<Integer>>();
-		abrtdTxns = new HashSet<Integer>();
+		abrtdTxns = new ConcurrentHashMap<Integer, Object>();
 
 		// How many threads do we want ?
 		// This is a configurable value. Need to set it to optimal value.
@@ -1809,7 +1810,7 @@ implements ResourceManager {
 		}
 		System.out.println("After calling get aborted");
 		System.out.println("ABorted Transactions");
-		for(int s : abrtdTxns){
+		for(Integer s : abrtdTxns.keySet()){
 			System.out.println(s);
 		}
 		
