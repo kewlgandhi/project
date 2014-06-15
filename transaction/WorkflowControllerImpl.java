@@ -20,11 +20,11 @@ implements WorkflowController {
 	protected int xidCounter;
 	private ConcurrentHashMap<Integer,Object> activeTxns;
 
-	protected ResourceManagerImpl rmFlights = null;
-	protected ResourceManagerImpl rmRooms = null;
-	protected ResourceManagerImpl rmCars = null;
-	protected ResourceManagerImpl rmCustomers = null;
-	protected TransactionManagerImpl tm = null;
+	protected ResourceManager rmFlights = null;
+	protected ResourceManager rmRooms = null;
+	protected ResourceManager rmCars = null;
+	protected ResourceManager rmCustomers = null;
+	protected TransactionManager tm = null;
 
 	public static void main(String args[]) {
 		System.setSecurityManager(new RMISecurityManager());
@@ -81,7 +81,7 @@ implements WorkflowController {
 		flightprice = 0;
 
 		xidCounter = 1;
-
+		// reconnect();
 		while (!reconnect()) {
 			// would be better to sleep a while
 		} 
@@ -643,23 +643,23 @@ implements WorkflowController {
 
 		try {
 			rmFlights =
-					(ResourceManagerImpl)Naming.lookup(rmiPort +
+					(ResourceManager)Naming.lookup(rmiPort +
 							ResourceManager.RMINameFlights);
 			System.out.println("WC bound to RMFlights");
 			rmRooms =
-					(ResourceManagerImpl)Naming.lookup(rmiPort +
+					(ResourceManager)Naming.lookup(rmiPort +
 							ResourceManager.RMINameRooms);
 			System.out.println("WC bound to RMRooms");
 			rmCars =
-					(ResourceManagerImpl)Naming.lookup(rmiPort +
+					(ResourceManager)Naming.lookup(rmiPort +
 							ResourceManager.RMINameCars);
 			System.out.println("WC bound to RMCars");
 			rmCustomers =
-					(ResourceManagerImpl)Naming.lookup(rmiPort +
+					(ResourceManager)Naming.lookup(rmiPort +
 							ResourceManager.RMINameCustomers);
 			System.out.println("WC bound to RMCustomers");
 			tm =
-					(TransactionManagerImpl)Naming.lookup(rmiPort +
+					(TransactionManager)Naming.lookup(rmiPort +
 							TransactionManager.RMIName);
 			System.out.println("WC bound to TM");
 		} 
