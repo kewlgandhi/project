@@ -217,7 +217,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	}
 
 
-	public void setDieTMafterCommit(boolean dieTMafterCommit) {
+	public void setDieTMafterCommit(boolean dieTMafterCommit) throws RemoteException{
 		this.dieTMafterCommit = dieTMafterCommit;
 	}
 
@@ -227,7 +227,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	}
 
 
-	public void setDieTMbeforeCommit(boolean dieTMbeforeCommit) {
+	public void setDieTMbeforeCommit(boolean dieTMbeforeCommit) throws RemoteException{
 		this.dieTMbeforeCommit = dieTMbeforeCommit;
 	}
 

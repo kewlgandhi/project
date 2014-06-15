@@ -411,12 +411,15 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmFlights.queryFlight(xid, flightNum));
+			returnVal = (rmFlights.queryFlight(xid, flightNum));
 		}
 		catch(RemoteException e)
 		{
 		}
+		
+		return returnVal;
 
 	}
 	/** Return the price of a seat on this flight. Return -1 if flightNum==null or doesn't exist.*/
@@ -425,13 +428,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmFlights.queryFlightPrice(xid, flightNum));
+			returnVal = (rmFlights.queryFlightPrice(xid, flightNum));
 		}
 		catch(RemoteException e)
 		{
 		}
-
+		return returnVal;
 	}
 	/** Return the number of rooms available at a location. */
 	public int queryRooms(int xid, String location)
@@ -439,13 +443,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmRooms.queryRooms(xid, location));
+			returnVal = (rmRooms.queryRooms(xid, location));
 		}
 		catch(RemoteException e)
 		{
 		}
-
+		return returnVal;
 	}
 	/** Return the price of rooms at this location. */
 	public int queryRoomsPrice(int xid, String location)
@@ -453,12 +458,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return (rmRooms.queryRoomsPrice(xid, location));
+			returnVal =  (rmRooms.queryRoomsPrice(xid, location));
 		}
 		catch(RemoteException e)
 		{
 		}
+		return returnVal;
 
 	}
 	/** Return the number of cars available at a location. */
@@ -467,13 +474,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmCars.queryCars(xid, location));
+			returnVal = (rmCars.queryCars(xid, location));
 		}
 		catch(RemoteException e)
 		{
 		}
-
+		return returnVal;
 	}
 	/** Return the price of rental cars at this location. */
 	public int queryCarsPrice(int xid, String location)
@@ -481,13 +489,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmCars.queryCarsPrice(xid, location));
+			returnVal = (rmCars.queryCarsPrice(xid, location));
 		}
 		catch(RemoteException e)
 		{
 		}
-
+		return returnVal;
 	}
 	/** Return the total price of all reservations held for a customer. Return -1 if custName==null or doesn't exist.*/
 	public int queryCustomerBill(int xid, String custName)
@@ -495,13 +504,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		int returnVal = 0;
 		try{
-			return(rmCustomers.queryCustomerBill(xid, custName));
+			returnVal = (rmCustomers.queryCustomerBill(xid, custName));
 		}
 		catch(RemoteException e)
 		{
 		}
-
+		return returnVal;
 	}
 
 
@@ -523,12 +533,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		boolean returnVal = false;
 		try{
-			return(rmFlights.reserveFlight(xid, custName, flightNum));
+			returnVal = (rmFlights.reserveFlight(xid, custName, flightNum));
 		}
 		catch(RemoteException e)
 		{
 		}
+		return returnVal;
 	}
 	/** Reserve a car for this customer at the specified location. */
 	public boolean reserveCar(int xid, String custName, String location) 
@@ -536,12 +548,14 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		boolean returnVal = false;
 		try{
-			return(rmCars.reserveCar(xid, custName, location));
+			returnVal = (rmCars.reserveCar(xid, custName, location));
 		}
 		catch(RemoteException e)
 		{
 		}
+		return returnVal;
 	}
 	/** Reserve a room for this customer at the specified location. */
 	public boolean reserveRoom(int xid, String custName, String location) 
@@ -549,8 +563,9 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		isValidTrxn(xid);
+		boolean returnVal = false;
 		try{
-			return(rmRooms.reserveRoom(xid, custName, location));
+			returnVal = (rmRooms.reserveRoom(xid, custName, location));
 		}
 		catch(RemoteException e)
 		{
@@ -560,6 +575,7 @@ implements WorkflowController {
 			tm.abort(xid);
 			throw new TransactionAbortedException(xid,"aborted at one of the locales . so undoing everything");
 		}
+		return returnVal;
 	}
 	/**
 	 * Reserve an entire itinerary on behalf of this customer.
@@ -756,8 +772,10 @@ implements WorkflowController {
 			}
 			return true;
 		}
-
-	} /**
+		return false;
+	} 
+	
+	/**
 	 * Sets a flag so that the RM fails when it next tries to prepare,
 	 * but before it gets a chance to save the update list to disk.
 	 * <p>
@@ -800,6 +818,7 @@ implements WorkflowController {
 			}
 			return true;
 		}
+		return false;
 	}
 	/**
 	 * Sets a flag so that the RM fails when it next tries to prepare:
@@ -845,6 +864,7 @@ implements WorkflowController {
 			}
 			return true;
 		}
+		return false;
 	}
 	/**
 	 * Sets a flag so that the TM fails after it has received
@@ -930,6 +950,7 @@ implements WorkflowController {
 			}
 			return true;
 		}
+		return false;
 	}
 	/**
 	 * Sets a flag so that the RM fails when it is told by the TM to
@@ -975,5 +996,6 @@ implements WorkflowController {
 			}
 			return true;
 		}
+		return false;
 	}
 }

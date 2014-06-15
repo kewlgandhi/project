@@ -44,7 +44,7 @@ extends java.rmi.server.UnicastRemoteObject
 implements ResourceManager {
 
 	protected String myRMIName = null; // Used to distinguish this RM from other RMs
-	protected TransactionManager tm = null;
+	protected TransactionManagerImpl tm = null;
 
 	// Constants
 	// Other Variables
@@ -57,23 +57,23 @@ implements ResourceManager {
 	//Die now test variables
 	private boolean dieAfterEnlist = false;
 	private boolean dieBeforePrepare = false;
-	public void setDieAfterEnlist(boolean dieAfterEnlist) {
+	public void setDieAfterEnlist(boolean dieAfterEnlist) throws RemoteException{
 		this.dieAfterEnlist = dieAfterEnlist;
 	}
 
-	public void setDieBeforePrepare(boolean dieBeforePrepare) {
+	public void setDieBeforePrepare(boolean dieBeforePrepare) throws RemoteException{
 		this.dieBeforePrepare = dieBeforePrepare;
 	}
 
-	public void setDieAfterPrepare(boolean dieAfterPrepare) {
+	public void setDieAfterPrepare(boolean dieAfterPrepare) throws RemoteException{
 		this.dieAfterPrepare = dieAfterPrepare;
 	}
 
-	public void setDieBeforeCommit(boolean dieBeforeCommit) {
+	public void setDieBeforeCommit(boolean dieBeforeCommit) throws RemoteException{
 		this.dieBeforeCommit = dieBeforeCommit;
 	}
 
-	public void setDieBeforeAbort(boolean dieBeforeAbort) {
+	public void setDieBeforeAbort(boolean dieBeforeAbort) throws RemoteException{
 		this.dieBeforeAbort = dieBeforeAbort;
 	}
 
@@ -380,7 +380,7 @@ implements ResourceManager {
 		}
 
 		try {
-			tm = (TransactionManager)Naming.lookup(rmiPort + TransactionManager.RMIName);
+			tm = (TransactionManagerImpl)Naming.lookup(rmiPort + TransactionManager.RMIName);
 			System.out.println(myRMIName + " bound to TM");
 		} 
 		catch (Exception e) {
@@ -1848,13 +1848,15 @@ implements ResourceManager {
 		System.out.println("REDO phase done");
 	}
 
-	// TM INTERFACE
-	/*	public void register(int xid){
-		tm.enlist(xid,this);
-	}*/
-
 	public boolean prepare(int xid) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 }
+// TM INTERFACE
+/*	public void register(int xid){
+		tm.enlist(xid,this);
+	}*/
+
+
+

@@ -18,4 +18,6 @@ public interface TransactionManager extends Remote {
 
     /** The RMI name a TransactionManager binds to. */
     public static final String RMIName = "TM";
+
+
 }
