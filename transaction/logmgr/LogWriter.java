@@ -13,7 +13,7 @@ public class LogWriter {
 		this.fileName = fileName;
 	}
 	
-	
+	//TODO : where are we calling this??
 	public void loadFile(){
 		System.out.println("Creating Redo logs for "+ fileName);
 		try {

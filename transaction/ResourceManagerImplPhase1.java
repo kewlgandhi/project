@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Description: toy implementation of the RM, for initial testing
  */
 
-public class ResourceManagerImpl 
+public class ResourceManagerImplPhase1 
 extends java.rmi.server.UnicastRemoteObject
 implements ResourceManager {
 
@@ -134,7 +134,7 @@ implements ResourceManager {
 		}
 	}
 
-	public ResourceManagerImpl() throws RemoteException {
+	public ResourceManagerImplPhase1() throws RemoteException {
 		System.out.println("starting constructor");
 		lockManager = new LockManager();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
