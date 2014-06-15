@@ -101,20 +101,23 @@ implements WorkflowController {
 	 *
 	 * @throws RemoteException on communications failure.
 	 */
+
+	// UTILITY
+	public void isValidTrxn(int xid) throws InvalidTransactionException{
+
+		if(activeTxns.get(xid) == null){
+			throw new InvalidTransactionException(xid,"isValidTrxn: "+ RMIName);
+		}
+		return ;
+
+	}
 	// TRANSACTION INTERFACE
 	public int start()
 			throws RemoteException {
 
-		try{
 			int temp = tm.start();
 			activeTxns.put(temp, new Object());
 			return temp;
-		}
-		catch(RemoteException e)
-		{
-			return 0;
-		}
-
 	}
 	/**
 	 * Commit transaction.
@@ -131,14 +134,7 @@ implements WorkflowController {
 			TransactionAbortedException, 
 			InvalidTransactionException {
 		System.out.println("Calling commit  at WC");
-
-		/*try{
-			return(tm.commit(xid));
-    	}
-    	catch(RemoteException e)
-    	{
-    		return false;
-    	}*/
+		isValidTrxn(xid);
 		boolean returnVal;
 		try{
 			returnVal = tm.commit(xid);
@@ -148,7 +144,6 @@ implements WorkflowController {
 		}
 		activeTxns.remove(xid);
 		return returnVal;
-
 	}
 	/**
 	 * Abort transaction.
@@ -162,6 +157,7 @@ implements WorkflowController {
 			throws RemoteException, 
 			InvalidTransactionException {
 		boolean returnVal;
+		isValidTrxn(xid);
 		try{
 			returnVal = tm.abort(xid);
 
@@ -170,7 +166,6 @@ implements WorkflowController {
 			throw ex;
 		}
 		activeTxns.remove(xid);
-
 	}
 	/**
 	 * Add seats to a flight.  In general this will be used to create
@@ -194,12 +189,13 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmFlights.addFlight(xid, flightNum, numSeats, price));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
+
 		}
 
 	}
@@ -219,12 +215,13 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmFlights.deleteFlight(xid, flightNum));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
+
 		}
 
 
@@ -246,12 +243,13 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmRooms.addRooms(xid, location, numRooms, price));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
+
 		}
 	}
 	/**
@@ -272,12 +270,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmRooms.deleteRooms(xid, location, numRooms));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -298,12 +296,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCars.addCars(xid, location, numCars, price));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -324,12 +322,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCars.deleteCars(xid, location, numCars));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -349,12 +347,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCustomers.newCustomer(xid, custName));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -373,12 +371,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCustomers.deleteCustomer(xid, custName));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -401,12 +399,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmFlights.queryFlight(xid, flightNum));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -415,12 +413,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmFlights.queryFlightPrice(xid, flightNum));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -429,12 +427,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmRooms.queryRooms(xid, location));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -443,12 +441,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return (rmRooms.queryRoomsPrice(xid, location));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -457,12 +455,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCars.queryCars(xid, location));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -471,12 +469,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCars.queryCarsPrice(xid, location));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -485,12 +483,12 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCustomers.queryCustomerBill(xid, custName));
 		}
 		catch(RemoteException e)
 		{
-			return 0;
 		}
 
 	}
@@ -513,47 +511,44 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmFlights.reserveFlight(xid, custName, flightNum));
 		}
 		catch(RemoteException e)
 		{
-			return false;
 		}
-		return true;
 	}
 	/** Reserve a car for this customer at the specified location. */
 	public boolean reserveCar(int xid, String custName, String location) 
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmCars.reserveCar(xid, custName, location));
 		}
 		catch(RemoteException e)
 		{
-			return false;
 		}
-		return true;
 	}
 	/** Reserve a room for this customer at the specified location. */
 	public boolean reserveRoom(int xid, String custName, String location) 
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		isValidTrxn(xid);
 		try{
 			return(rmRooms.reserveRoom(xid, custName, location));
 		}
 		catch(RemoteException e)
 		{
-			return false;
 		}
 		catch(TransactionAbortedException e)
 		{
 			tm.abort(xid);
-			throw new TransactionAbortedException(Xid,"aborted at one of the locales . so undoing everything");
+			throw new TransactionAbortedException(xid,"aborted at one of the locales . so undoing everything");
 		}
-		return true;
 	}
 	/**
 	 * Reserve an entire itinerary on behalf of this customer.
@@ -575,6 +570,7 @@ implements WorkflowController {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		boolean result=true;
+		isValidTrxn(xid);
 		try{
 
 			for(Object flightNum: flightNumList)
@@ -588,12 +584,11 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
-			return false;
 		}
 		catch(TransactionAbortedException e)
 		{
 			tm.abort(xid);
-			throw new TransactionAbortedException(Xid,"aborted at one of the locales . so undoing everything");
+			throw new TransactionAbortedException(xid,"aborted at one of the locales . so undoing everything");
 		}
 		return result;
 	}
