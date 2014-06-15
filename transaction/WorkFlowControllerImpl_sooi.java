@@ -101,22 +101,20 @@ implements WorkflowController {
 	 *
 	 * @throws RemoteException on communications failure.
 	 */
-
-	// UTILITY
-	public void isValidTrxn(int xid) throws InvalidTransactionException{
-		if(activeTxns.get(xid) == null){
-			throw new InvalidTransactionException(xid,"isValidTrxn: "+ RMIName);
-		}
-		return ;
-
-	}
-
 	// TRANSACTION INTERFACE
 	public int start()
 			throws RemoteException {
+
+		try{
 			int temp = tm.start();
 			activeTxns.put(temp, new Object());
 			return temp;
+		}
+		catch(RemoteException e)
+		{
+			return 0;
+		}
+
 	}
 	/**
 	 * Commit transaction.
@@ -148,6 +146,7 @@ implements WorkflowController {
 			activeTxns.remove(xid);
 			throw ex;
 		}
+		activeTxns.remove(xid);
 		return returnVal;
 
 	}
@@ -165,11 +164,12 @@ implements WorkflowController {
 		boolean returnVal;
 		try{
 			returnVal = tm.abort(xid);
+
 		}catch(Exception ex){
 			activeTxns.remove(xid);
 			throw ex;
 		}
-
+		activeTxns.remove(xid);
 
 	}
 	/**
