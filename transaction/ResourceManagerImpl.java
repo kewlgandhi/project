@@ -56,6 +56,13 @@ implements ResourceManager {
 	private final int READ = 0;
 	private final int CHECKPOINT_TRIGGER = 10;
 	private final int SLEEPSHUTDOWN = 5000;
+	
+	//Die now test variables
+	private boolean dieAfterEnlist = false;
+	private boolean dieBeforePrepare = false;
+	private boolean dieAfterPrepare = false;
+	private boolean dieBeforeCommit = false;
+	private boolean dieBeforeAbort = false;
 
 	// Data Sets
 	private ConcurrentHashMap<String,Flight> flightTable;
@@ -1798,5 +1805,10 @@ implements ResourceManager {
 			return;
 		}
 		System.out.println("REDO phase done");
+	}
+	
+	// TM INTERFACE
+	public void register(xid){
+		tm.register(xid,myRMIName);
 	}
 }
