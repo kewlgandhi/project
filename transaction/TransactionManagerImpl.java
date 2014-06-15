@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import transaction.bean.State;
 import transaction.bean.TransactionDetails;
@@ -24,7 +25,7 @@ import transaction.logmgr.VariableLogger;
 public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject implements TransactionManager {
 	
 	private Map<Integer, TransactionDetails> transactions;
-	protected Integer xidCounter;
+	protected AtomicInteger xidCounter;
 	private LogWriter logWriter;
 	private String logFile;
 	private ExecutorService executor;
@@ -149,6 +150,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			abort(xid);
 			return false;
 		}
+		activeTxns.remove(xid);
 		return true;
 	}
 	
@@ -181,6 +183,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			}
 		}
 		
+		activeTxns.remove(xid);
 		if(!allAborted){
 			return false;
 		}
@@ -227,11 +230,12 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		int temp;
 		synchronized (xidCounter) {
 			temp = xidCounter.intValue();
-			xidCounter = xidCounter + 1;
+			xidCounter.set(xidCounter.get()+1);
+			activeTxns.put(temp, new Object());
 		}
 		StringBuilder logMsg = new StringBuilder("");
 		//Logging
-		logMsg.append(xid+"@#@").append("START\n");
+		logMsg.append(temp+"@#@").append("START\n");
 		Future ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
 		try{
 			ret.get();
