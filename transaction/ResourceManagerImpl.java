@@ -373,8 +373,7 @@ implements ResourceManager {
 	}
 
 	// TRANSACTION INTERFACE
-	public int start() throws RemoteException {
-		int temp;
+	public void start(int xid) throws RemoteException {
 		synchronized(enteredTxnsCount){
 			System.out.println("Entering start: "+ myRMIName);
 			synchronized(stopAndWait){
@@ -390,28 +389,27 @@ implements ResourceManager {
 			}
 			// do a checkpoint if at least CPT transactions have entered, and at least half of them have committed.
 			if(enteredTxnsCount>=CHECKPOINT_TRIGGER && committedTrxns.get() >= (CHECKPOINT_TRIGGER/2)){
-				stopIncoming(); //note here that the check pointing is being done on a thread which has not been allocated a Xid yet.
+				//note here that the check pointing is being done on a thread which has not been allocated a Xid yet.
+				stopIncoming(); 
 				System.out.println("Checkpointing....: "+ myRMIName);
 			}//else check if already some process is trying to stop incoming
-			if(activeTxns.containsKey(xidCounter)){
+			if(activeTxns.containsKey(xid)){
 				// HOW TO HANDLE THIS ?
 				System.out.println("SHOULD NOT REACH: XID DUPLICATE: "+ myRMIName);
 			}
 			enteredTxnsCount++;
-			temp = xidCounter++;
 		}
 
 		synchronized(HashSetEmpty){
-			activeTxns.put(temp,DUMMY);
-			System.out.println("TID assigned is: "+temp+ " in: "+ myRMIName);
+			activeTxns.put(xid,DUMMY);
 			HashSetEmpty.set(false);
 		}
 
 		//<----------UNDOING--------------------->
-		UndoIMTable.put(temp,new Stack<UndoIMLog>() );
+		UndoIMTable.put(xid,new Stack<UndoIMLog>() );
 		//</----------UNDOING--------------------->
 		System.out.println("started succesfully");
-		return (temp);
+		return ;
 	}
 
 	public void removeXID (int xid) throws InvalidTransactionException, TransactionAbortedException
