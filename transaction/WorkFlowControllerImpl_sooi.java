@@ -698,7 +698,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	 	if (who.equals(ResourceManager.RMINameFlights) ){
     		    try {
-    			rmFlights.dieAfterEnlist();
+    			rmFlights.setDieAfterEnlist(true);
     		    } catch (RemoteException e) {
     		    	return false;
     		    }
@@ -706,7 +706,7 @@ public class WorkflowControllerImpl_sooi
     		}
     		if (who.equals(ResourceManager.RMINameRooms) ) {
     		    try {
-    			rmRooms.dieAfterEnlist();
+    			rmRooms.setDieAfterEnlist(true);;
     		    } catch (RemoteException e) {
     		    	return false;
     		    }
@@ -714,7 +714,7 @@ public class WorkflowControllerImpl_sooi
     		}
     		if (who.equals(ResourceManager.RMINameCars) ) {
     		    try {
-    			rmCars.dieAfterEnlist();
+    			rmCars.setDieAfterEnlist(true);
     		    } catch (RemoteException e) {
     		    	return false;
     		    }
@@ -722,7 +722,7 @@ public class WorkflowControllerImpl_sooi
     		}
     		if (who.equals(ResourceManager.RMINameCustomers) ) {
     		    try {
-    			rmCustomers.dieAfterEnlist();
+    			rmCustomers.setDieAfterEnlist(true);
     		    } catch (RemoteException e) {
     		    	return false;
     		    }
@@ -742,7 +742,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	if (who.equals(ResourceManager.RMINameFlights) ){
 		    try {
-			rmFlights.dieBeforePrepare();
+			rmFlights.setDieBeforePrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -750,7 +750,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameRooms) ) {
 		    try {
-			rmRooms.dieBeforePrepare();
+			rmRooms.setDieBeforePrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -758,7 +758,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCars) ) {
 		    try {
-			rmCars.dieBeforePrepare();
+			rmCars.setDieBeforePrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -766,7 +766,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCustomers) ) {
 		    try {
-			rmCustomers.dieBeforePrepare();
+			rmCustomers.setDieBeforePrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -787,7 +787,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	if (who.equals(ResourceManager.RMINameFlights) ){
 		    try {
-			rmFlights.dieAfterPrepare();
+			rmFlights.setDieAfterPrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -795,7 +795,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameRooms) ) {
 		    try {
-			rmRooms.dieAfterPrepare();
+			rmRooms.setDieAfterPrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -803,7 +803,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCars) ) {
 		    try {
-			rmCars.dieAfterPrepare();
+			rmCars.setDieAfterPrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -811,7 +811,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCustomers) ) {
 		    try {
-			rmCustomers.dieAfterPrepare();
+			rmCustomers.setDieAfterPrepare(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -831,7 +831,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	
     	try{
-    		tm.dieBeforeCommit();
+    		tm.setDieTMbeforeCommit(true);
     	}
     	catch(RemoteException e)
     	{
@@ -850,7 +850,7 @@ public class WorkflowControllerImpl_sooi
     public boolean dieTMAfterCommit()
 	throws RemoteException {
     	try{
-    		tm.dieAfterCommit();
+    		tm.setDieTMafterCommit(true);
     	}
     	catch(RemoteException e)
     	{
@@ -872,7 +872,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	if (who.equals(ResourceManager.RMINameFlights) ){
 		    try {
-			rmFlights.dieBeforeCommit();
+			rmFlights.setDieBeforeCommit(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -880,7 +880,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameRooms) ) {
 		    try {
-			rmRooms.dieBeforeCommit();
+			rmRooms.setDieBeforeCommit(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -888,7 +888,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCars) ) {
 		    try {
-			rmCars.dieBeforeCommit();
+			rmCars.setDieBeforeCommit(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -896,7 +896,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCustomers) ) {
 		    try {
-			rmCustomers.dieBeforeCommit();
+			rmCustomers.setDieBeforeCommit(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -917,7 +917,7 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	if (who.equals(ResourceManager.RMINameFlights) ){
 		    try {
-			rmFlights.dieBeforeAbort();
+			rmFlights.setDieBeforeAbort(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -925,7 +925,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameRooms) ) {
 		    try {
-			rmRooms.dieBeforeAbort();
+			rmRooms.setDieBeforeAbort(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -933,7 +933,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCars) ) {
 		    try {
-			rmCars.dieBeforeAbort();
+			rmCars.setDieBeforeAbort(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }
@@ -941,7 +941,7 @@ public class WorkflowControllerImpl_sooi
 		}
 		if (who.equals(ResourceManager.RMINameCustomers) ) {
 		    try {
-			rmCustomers.dieBeforeAbort();
+			rmCustomers.setDieBeforeAbort(true);
 		    } catch (RemoteException e) {
 		    	return false;
 		    }

@@ -2,7 +2,6 @@ package transaction;
 
 import lockmgr.*;
 
-import java.awt.color.CMMException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -54,10 +53,30 @@ implements ResourceManager {
 	private final int READ = 0;
 	private final int CHECKPOINT_TRIGGER = 10;
 	private final int SLEEPSHUTDOWN = 5000;
-	
+
 	//Die now test variables
 	private boolean dieAfterEnlist = false;
 	private boolean dieBeforePrepare = false;
+	public void setDieAfterEnlist(boolean dieAfterEnlist) {
+		this.dieAfterEnlist = dieAfterEnlist;
+	}
+
+	public void setDieBeforePrepare(boolean dieBeforePrepare) {
+		this.dieBeforePrepare = dieBeforePrepare;
+	}
+
+	public void setDieAfterPrepare(boolean dieAfterPrepare) {
+		this.dieAfterPrepare = dieAfterPrepare;
+	}
+
+	public void setDieBeforeCommit(boolean dieBeforeCommit) {
+		this.dieBeforeCommit = dieBeforeCommit;
+	}
+
+	public void setDieBeforeAbort(boolean dieBeforeAbort) {
+		this.dieBeforeAbort = dieBeforeAbort;
+	}
+
 	private boolean dieAfterPrepare = false;
 	private boolean dieBeforeCommit = false;
 	private boolean dieBeforeAbort = false;
@@ -85,8 +104,8 @@ implements ResourceManager {
 	private AtomicBoolean stopAndWait = new AtomicBoolean(false);
 	private AtomicBoolean HashSetEmpty = new AtomicBoolean(true);
 
-	private Boolean DieBeforeCommit = new Boolean(false);
-	private Boolean DieAfterCommit = new Boolean(false);
+	private Boolean dieBeforePointerSwitch = new Boolean(false);
+	private Boolean dieAfterPointerSwitch = new Boolean(false);
 
 	private ExecutorService checkPointers ;
 	private Set<Callable<Integer>> callables;
@@ -283,9 +302,9 @@ implements ResourceManager {
 				stopAndWait.set(true);
 			}
 			else
-			// 	means stopandwait already raised due to some other condition.
-			// 	makes no difference , can only happen in case of shutdown/Cp or CP/shutdown.
-			// 	hence do nothing.
+				// 	means stopandwait already raised due to some other condition.
+				// 	makes no difference , can only happen in case of shutdown/Cp or CP/shutdown.
+				// 	hence do nothing.
 				return;
 		}
 		//wait for all transactions to get over. Sleep on the HashSetEmpty object.
@@ -429,11 +448,13 @@ implements ResourceManager {
 		// When xid is removed from the hashset , see if the hashset becomes equal to the shuttingDown.get() value -
 		// implies there are no more useful processes left. hence can shutdown the system.
 
+		//Check if transaction is already commited, If so, just return true
 		if(comtdTxns.containsKey(xid))
 			return true;
-		synchronized(DieBeforeCommit)
+		
+		synchronized(dieBeforePointerSwitch)
 		{
-			if(DieBeforeCommit)
+			if(dieBeforePointerSwitch)
 			{
 				dieNow();
 			}
@@ -448,8 +469,8 @@ implements ResourceManager {
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
 		logWriter.flush();
-		synchronized(DieAfterCommit){
-			if(DieAfterCommit){
+		synchronized(dieAfterPointerSwitch){
+			if(dieAfterPointerSwitch){
 				dieNow();
 			}
 		}
@@ -550,9 +571,11 @@ implements ResourceManager {
 		//<----------UNDOING--------------------->
 
 		//TODO: Changes to be verified
+		
+		//Check if transaction is already aborted, if so, just return
 		if(abrtdTxns.containsKey(xid))
 			return;
-		
+
 		try {
 			isValidTrxn(xid);
 		} catch (TransactionAbortedException e1) {
@@ -1751,22 +1774,22 @@ implements ResourceManager {
 
 	public boolean dieBeforePointerSwitch() 
 			throws RemoteException {
-		synchronized(DieBeforeCommit){
+		synchronized(dieBeforePointerSwitch){
 			//TODO: Should DieBeforeCommit be atomic boolean ?
-			DieBeforeCommit=DieBeforeCommit.valueOf(true);
+			dieBeforePointerSwitch=dieBeforePointerSwitch.valueOf(true);
 		}
 		return true;
 	}
 
 	public boolean dieAfterPointerSwitch() 
 			throws RemoteException {
-		synchronized(DieAfterCommit){
+		synchronized(dieAfterPointerSwitch){
 			//TODO: Should DieAfterCommit be atomic boolean ?
-			DieAfterCommit=DieAfterCommit.valueOf(true);
+			dieAfterPointerSwitch=dieAfterPointerSwitch.valueOf(true);
 		}
 		return true;
 	}
-	
+
 	//RECOVERY/ STARTUP INTERFACE
 
 	public void loadFiles() throws RemoteException,FileNotFoundException{
@@ -1792,7 +1815,7 @@ implements ResourceManager {
 		comtdTxns = recoveryManager.getComtdTxns();
 		prprdTxns = recoveryManager.getPrprdTxns();
 		xidCounter = recoveryManager.getMAXid() + 1;
-		
+
 		if(recoveryRequired==false){
 			System.out.println("No Need to recover");
 			return;
@@ -1804,9 +1827,14 @@ implements ResourceManager {
 		}
 		System.out.println("REDO phase done");
 	}
-	
+
 	// TM INTERFACE
-	public void register(xid){
-		tm.register(xid,myRMIName);
+/*	public void register(int xid){
+		tm.enlist(xid,this);
+	}*/
+
+	public boolean prepare(int xid) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

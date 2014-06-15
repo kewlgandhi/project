@@ -26,7 +26,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	private LogWriter logWriter;
 	private String logFile;
 	private ExecutorService executor;
-
+	private boolean dieTMbeforeCommit = false;
+	private boolean dieTMafterCommit = false;
+	
 	public static void main(String args[]) {
 		System.setSecurityManager(new RMISecurityManager());
 
@@ -125,6 +127,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				transactions.remove(xid);
 				//Logging
 				logMsg.append(xid+"@#@").append("Transactions@#@STATUS@#@").append(State.COMMITTED.toString()+"\n");
+				logMsg.append(xid+"@#@").append("Transactions@#@DELETE@#@").append("\n");
 				ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
 				try{
 					ret.get();
@@ -151,8 +154,10 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			//TODO: what to do?
 		}
 		details.setStatus(State.ABORTED);
+		transactions.remove(xid);
 		//Logging
 		logMsg.append(xid+"@#@").append("Transactions@#@STATUS@#@").append(State.ABORTED.toString()+"\n");
+		logMsg.append(xid+"@#@").append("Transactions@#@DELETE@#@").append("\n");
 		Future ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
 		try{
 			ret.get();
@@ -192,4 +197,24 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		// but we still need it to please the compiler.
 	}
 
+
+	public boolean isDieTMafterCommit() {
+		return dieTMafterCommit;
+	}
+
+
+	public void setDieTMafterCommit(boolean dieTMafterCommit) {
+		this.dieTMafterCommit = dieTMafterCommit;
+	}
+
+
+	public boolean isDieTMbeforeCommit() {
+		return dieTMbeforeCommit;
+	}
+
+
+	public void setDieTMbeforeCommit(boolean dieTMbeforeCommit) {
+		this.dieTMbeforeCommit = dieTMbeforeCommit;
+	}
+	
 }
