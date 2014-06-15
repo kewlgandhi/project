@@ -62,7 +62,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		logWriter = new LogWriter(logFile);
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
-		xidCounter = 1;
+		xidCounter = new AtomicInteger(0);
 	}
 	
 	public void enlist(int xid, ResourceManagerImpl rm){
@@ -126,6 +126,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 					allCommitted = allCommitted && rm.commit(xid);
 				}catch(RemoteException e){
 					allCommitted = false;
+				}catch(Exception ex){
+					System.out.println("Decide what to do");
+					//TODO: decide what to do
 				}
 			}
 			if(allCommitted){
@@ -180,6 +183,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				rm.abort(xid);
 			}catch(RemoteException e){
 				allAborted = false;
+			}catch(Exception ex){
+				System.out.println("Decide what to do");
+				//TODO: decide what to do
 			}
 		}
 		

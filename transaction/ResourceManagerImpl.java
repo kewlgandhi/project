@@ -1853,7 +1853,7 @@ implements ResourceManager {
 		tm.enlist(xid,this);
 	}*/
 
-	public boolean prepare(int xid) {
+	public boolean prepare(int xid) throws RemoteException {
 		// TODO Auto-generated method stub
 		return false;
 	}
