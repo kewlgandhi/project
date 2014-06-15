@@ -2,6 +2,7 @@ package transaction;
 
 import java.rmi.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** 
  * Workflow Controller for the Distributed Travel Reservation System.
@@ -17,6 +18,7 @@ public class WorkflowControllerImpl_sooi
 
     protected int flightcounter, flightprice, carscounter, carsprice, roomscounter, roomsprice; 
     protected int xidCounter;
+    private ConcurrentHashMap<Integer,Object> activeTxns;
     
     protected ResourceManagerImpl rmFlights = null;
     protected ResourceManagerImpl rmRooms = null;
@@ -70,19 +72,26 @@ public class WorkflowControllerImpl_sooi
 
     
     public WorkflowControllerImpl_sooi() throws RemoteException {
-	flightcounter = 0;
-	flightprice = 0;
-	carscounter = 0;
-	carsprice = 0;
-	roomscounter = 0;
-	roomsprice = 0;
-	flightprice = 0;
+    	flightcounter = 0;
+    	flightprice = 0;
+    	carscounter = 0;
+    	carsprice = 0;
+    	roomscounter = 0;
+    	roomsprice = 0;
+    	flightprice = 0;
 
-	xidCounter = 1;
+    	xidCounter = 1;
 
-	while (!reconnect()) {
-	    // would be better to sleep a while
-	} 
+    	while (!reconnect()) {
+    		// would be better to sleep a while
+    	} 
+    	
+    	try{
+    		activeTxns = tm.getActiveTxns();
+    	}catch(Exception ex){
+    		activeTxns = new ConcurrentHashMap<Integer, Object>();
+    	}
+
     }
 
     /**
@@ -97,7 +106,9 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException {
     	    	
     	try{
-    		return (tm.start());
+    		int temp = tm.start();
+    		activeTxns.put(temp, new Object());
+    		return temp;
     	}
     	catch(RemoteException e)
     	{
@@ -119,16 +130,24 @@ public class WorkflowControllerImpl_sooi
 	throws RemoteException, 
 	       TransactionAbortedException, 
 	       InvalidTransactionException {
-	System.out.println("Calling commit  at WC");
-		
-		try{
+    	System.out.println("Calling commit  at WC");
+
+    	/*try{
 			return(tm.commit(xid));
     	}
     	catch(RemoteException e)
     	{
-    		return 0;
+    		return false;
+    	}*/
+    	boolean returnVal;
+    	try{
+    		returnVal = tm.commit(xid);
+    	}catch(Exception ex){
+    		activeTxns.remove(xid);
+    		throw ex;
     	}
-	
+    	return returnVal;
+
     }
     /**
      * Abort transaction.
@@ -141,13 +160,14 @@ public class WorkflowControllerImpl_sooi
     public void abort(int xid)
 	throws RemoteException, 
                InvalidTransactionException {
+    	boolean returnVal;
     	try{
-			return(tm.abort(xid));
+    		returnVal = tm.abort(xid);
+    	}catch(Exception ex){
+    		activeTxns.remove(xid);
+    		throw ex;
     	}
-    	catch(RemoteException e)
-    	{
-    		return 0;
-    	}
+    	
     	
     }
     /**

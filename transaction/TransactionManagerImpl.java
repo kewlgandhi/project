@@ -4,6 +4,7 @@ import java.rmi.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -29,6 +30,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	private ExecutorService executor;
 	private boolean dieTMbeforeCommit = false;
 	private boolean dieTMafterCommit = false;
+	private ConcurrentHashMap<Integer,Object> activeTxns;
 	
 	public static void main(String args[]) {
 		System.setSecurityManager(new RMISecurityManager());
@@ -58,6 +60,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		logFile = RMIName + ".log";
 		logWriter = new LogWriter(logFile);
 		executor = Executors.newSingleThreadExecutor();
+		activeTxns = new ConcurrentHashMap<Integer,Object>();
 		xidCounter = 1;
 	}
 	
@@ -238,6 +241,11 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		//End of logging
 		return temp;
+	}
+
+
+	public ConcurrentHashMap<Integer, Object> getActiveTxns() {
+		return activeTxns;
 	}
 	
 }
