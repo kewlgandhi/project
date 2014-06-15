@@ -146,6 +146,7 @@ public class WorkflowControllerImpl_sooi
     		activeTxns.remove(xid);
     		throw ex;
     	}
+    	activeTxns.remove(xid);
     	return returnVal;
 
     }
@@ -163,11 +164,12 @@ public class WorkflowControllerImpl_sooi
     	boolean returnVal;
     	try{
     		returnVal = tm.abort(xid);
+    		
     	}catch(Exception ex){
     		activeTxns.remove(xid);
     		throw ex;
     	}
-    	
+    	activeTxns.remove(xid);
     	
     }
     /**
