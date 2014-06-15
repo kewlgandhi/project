@@ -234,31 +234,31 @@ implements ResourceManager {
 		if(abrtdTxns.containsKey(xid)){
 			throw new TransactionAbortedException(xid,"isRegistered: "+ myRMIName );
 		}
-		
+
 		if(comtdTxns.containsKey(xid)){
 			System.out.println("Should Not Reach Here, isRegistered: "+myRMIName);
 			throw new InvalidTransactionException(xid, "");
 		}
-		
+
 		if(activeTxns.containsKey(xid))
 			return;
-		
+
 		start(xid);
 		return;
 
 	}
 
-//	public void isValidTrxn(int xid)
-//			throws InvalidTransactionException, TransactionAbortedException{
-//		if(abrtdTxns.contains(xid)){
-//			throw new TransactionAbortedException(xid,"isValidTrxn: "+ myRMIName );
-//		}
-//		if(activeTxns.get(xid) == null){
-//			throw new InvalidTransactionException(xid,"isValidTrxn: "+ myRMIName);
-//		}
-//		return ;
-//
-//	}
+	//	public void isValidTrxn(int xid)
+	//	throws InvalidTransactionException, TransactionAbortedException{
+	//if(abrtdTxns.contains(xid)){
+	//	throw new TransactionAbortedException(xid,"isValidTrxn: "+ myRMIName );
+	//}
+	//if(activeTxns.get(xid) == null){
+	//	throw new InvalidTransactionException(xid,"isValidTrxn: "+ myRMIName);
+	//}
+	//return ;
+	//
+	//}
 
 	private void updateCheckPointVariables()
 	{
@@ -395,7 +395,7 @@ implements ResourceManager {
 	public void start(int xid) throws RemoteException {	
 		//Register this RM in TM
 		tm.enlist(xid,this);
-		
+
 		synchronized(enteredTxnsCount){
 			System.out.println("Entering start: "+ myRMIName);
 			synchronized(stopAndWait){
@@ -434,7 +434,7 @@ implements ResourceManager {
 		return ;
 	}
 
-	public void removeXID (int xid) throws InvalidTransactionException, TransactionAbortedException
+	public void removeXID (int xid) throws InvalidTransactionException, TransactionAbortedException, RemoteException
 	{
 		isRegistered(xid);
 		synchronized(activeTxns){
@@ -471,7 +471,7 @@ implements ResourceManager {
 		//Check if transaction is already commited, If so, just return true
 		if(comtdTxns.containsKey(xid))
 			return true;
-		
+
 		synchronized(dieBeforePointerSwitch)
 		{
 			if(dieBeforePointerSwitch)
@@ -591,7 +591,7 @@ implements ResourceManager {
 		//<----------UNDOING--------------------->
 
 		//TODO: Changes to be verified
-		
+
 		//Check if transaction is already aborted, if so, just return
 		if(abrtdTxns.containsKey(xid))
 			return;
@@ -1849,7 +1849,7 @@ implements ResourceManager {
 	}
 
 	// TM INTERFACE
-/*	public void register(int xid){
+	/*	public void register(int xid){
 		tm.enlist(xid,this);
 	}*/
 
