@@ -205,6 +205,7 @@ implements ResourceManager {
 		// Create Log File
 		logFile = myRMIName + ".log";
 		logWriter = new LogWriter(logFile);
+		logWriter.loadFile();
 
 		// Check for data directory
 		checkAndCreateData();
@@ -228,18 +229,36 @@ implements ResourceManager {
 		System.out.println("Closing constructor: "+ myRMIName);
 	}
 
-	public void isValidTrxn(int xid)
-			throws InvalidTransactionException, TransactionAbortedException{
-		if(abrtdTxns.contains(xid)){
-			throw new TransactionAbortedException(xid,"isValidTrxn: "+ myRMIName );
+	public void isRegistered(int xid)
+			throws InvalidTransactionException, TransactionAbortedException, RemoteException{
+		if(abrtdTxns.containsKey(xid)){
+			throw new TransactionAbortedException(xid,"isRegistered: "+ myRMIName );
 		}
-		if(activeTxns.get(xid) == null){
-			throw new InvalidTransactionException(xid,"isValidTrxn: "+ myRMIName);
+		
+		if(comtdTxns.containsKey(xid)){
+			System.out.println("Should Not Reach Here, isRegistered: "+myRMIName);
+			throw new InvalidTransactionException(xid, "");
 		}
-		return ;
+		
+		if(activeTxns.containsKey(xid))
+			return;
+		
+		start(xid);
+		return;
 
 	}
 
+//	public void isValidTrxn(int xid)
+//			throws InvalidTransactionException, TransactionAbortedException{
+//		if(abrtdTxns.contains(xid)){
+//			throw new TransactionAbortedException(xid,"isValidTrxn: "+ myRMIName );
+//		}
+//		if(activeTxns.get(xid) == null){
+//			throw new InvalidTransactionException(xid,"isValidTrxn: "+ myRMIName);
+//		}
+//		return ;
+//
+//	}
 
 	private void updateCheckPointVariables()
 	{
@@ -373,7 +392,10 @@ implements ResourceManager {
 	}
 
 	// TRANSACTION INTERFACE
-	public void start(int xid) throws RemoteException {
+	public void start(int xid) throws RemoteException {	
+		//Register this RM in TM
+		tm.enlist(xid,this);
+		
 		synchronized(enteredTxnsCount){
 			System.out.println("Entering start: "+ myRMIName);
 			synchronized(stopAndWait){
@@ -414,7 +436,7 @@ implements ResourceManager {
 
 	public void removeXID (int xid) throws InvalidTransactionException, TransactionAbortedException
 	{
-		isValidTrxn(xid);
+		isRegistered(xid);
 		synchronized(activeTxns){
 			System.out.println("About the remove entry from hashmap: "+ myRMIName);
 			activeTxns.remove(xid);
@@ -575,7 +597,7 @@ implements ResourceManager {
 			return;
 
 		try {
-			isValidTrxn(xid);
+			isRegistered(xid);
 		} catch (TransactionAbortedException e1) {
 			System.out.println("FadddieXID type case, Abort is called as first");
 			return;
@@ -634,7 +656,7 @@ implements ResourceManager {
 		String lockString = "Flight."+flightNum;
 
 		//Check if valid XID
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
@@ -712,7 +734,7 @@ implements ResourceManager {
 		StringBuilder logMsg = new StringBuilder("");
 
 		//Check if valid XID
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
@@ -763,7 +785,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 
-		isValidTrxn(xid);
+		isRegistered(xid);
 		try{
 			if(location==null)
 				return false;
@@ -853,7 +875,7 @@ implements ResourceManager {
 			InvalidTransactionException {
 
 		//throw InvalidTransactionException;
-		isValidTrxn(xid);
+		isRegistered(xid);
 		try{
 			if(location==null)
 				return false;
@@ -910,7 +932,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 
-		isValidTrxn(xid);		
+		isRegistered(xid);		
 		String lockString = "Cars."+location;
 		StringBuilder logMsg = new StringBuilder("");
 		try {
@@ -980,7 +1002,7 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
-		isValidTrxn(xid);
+		isRegistered(xid);
 		String lockString = "Cars."+location;
 		StringBuilder logMsg = new StringBuilder("");
 		try {
@@ -1031,7 +1053,7 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		// Null Customer Name
 		if(custName==null)
@@ -1199,7 +1221,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		//Check for invalid xid.
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		if(flightNum == null)
 			throw new InvalidTransactionException(xid, "message");
@@ -1228,7 +1250,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		//Check for invalid xid.
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		if(flightNum == null)
 			throw new InvalidTransactionException(xid, "message");
@@ -1274,7 +1296,7 @@ implements ResourceManager {
 			InvalidTransactionException {
 
 		//throw InvalidTransactionException;
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		if(location==null)
 			return 0;
@@ -1326,7 +1348,7 @@ implements ResourceManager {
 			InvalidTransactionException {
 
 		//throw InvalidTransactionException;
-		isValidTrxn(xid);
+		isRegistered(xid);
 		if(location==null)
 			return 0;
 		try{
@@ -1362,7 +1384,7 @@ implements ResourceManager {
 		{
 			return 0;
 		}
-		isValidTrxn(xid);
+		isRegistered(xid);
 		String lockString = "Cars."+location;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
@@ -1390,7 +1412,7 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
-		isValidTrxn(xid);
+		isRegistered(xid);
 		String lockString = "Cars."+location;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
@@ -1489,7 +1511,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 		// Check for valid xid
-		isValidTrxn(xid);
+		isRegistered(xid);
 
 		String lockString = "Flight." + flightNum;
 		try {
@@ -1594,7 +1616,7 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 
-		isValidTrxn(xid);
+		isRegistered(xid);
 		String lockString = "Cars." + location;
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
@@ -1667,7 +1689,7 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
-		isValidTrxn(xid);	
+		isRegistered(xid);	
 		try{
 			String lockString = "Hotels." + location;
 
