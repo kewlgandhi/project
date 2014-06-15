@@ -44,7 +44,7 @@ extends java.rmi.server.UnicastRemoteObject
 implements ResourceManager {
 
 	protected String myRMIName = null; // Used to distinguish this RM from other RMs
-	protected TransactionManagerImpl tm = null;
+	protected TransactionManager tm = null;
 
 	// Constants
 	// Other Variables
@@ -380,7 +380,7 @@ implements ResourceManager {
 		}
 
 		try {
-			tm = (TransactionManagerImpl)Naming.lookup(rmiPort + TransactionManager.RMIName);
+			tm = (TransactionManager)Naming.lookup(rmiPort + TransactionManager.RMIName);
 			System.out.println(myRMIName + " bound to TM");
 		} 
 		catch (Exception e) {

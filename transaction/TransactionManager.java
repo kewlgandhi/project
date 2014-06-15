@@ -20,4 +20,6 @@ public interface TransactionManager extends Remote {
     public static final String RMIName = "TM";
 
 
+	public void enlist(int xid, ResourceManagerImpl resourceManagerImpl);
+
 }
