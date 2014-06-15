@@ -6,5 +6,13 @@ public class TMRecoveryManager {
 		
 	}
 	
+	public void analyzeTMlogs(){
+		
+	}
+	
+	public void recoverTM(){
+		
+	}
+	
 	
 }
