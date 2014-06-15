@@ -23,6 +23,7 @@ import transaction.logmgr.VariableLogger;
 public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject implements TransactionManager {
 	
 	private Map<Integer, TransactionDetails> transactions;
+	protected Integer xidCounter;
 	private LogWriter logWriter;
 	private String logFile;
 	private ExecutorService executor;
@@ -57,6 +58,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		logFile = RMIName + ".log";
 		logWriter = new LogWriter(logFile);
 		executor = Executors.newSingleThreadExecutor();
+		xidCounter = 1;
 	}
 	
 	public void enlist(int xid, ResourceManagerImpl rm){
@@ -215,6 +217,27 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 
 	public void setDieTMbeforeCommit(boolean dieTMbeforeCommit) {
 		this.dieTMbeforeCommit = dieTMbeforeCommit;
+	}
+
+
+	public int start() {
+		int temp;
+		synchronized (xidCounter) {
+			temp = xidCounter.intValue();
+			xidCounter = xidCounter + 1;
+		}
+		StringBuilder logMsg = new StringBuilder("");
+		//Logging
+		logMsg.append(xid+"@#@").append("START\n");
+		Future ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
+		try{
+			ret.get();
+			logWriter.flush();
+		}catch(Exception e){
+			System.out.println("Error in writing log in 2PC");
+		}
+		//End of logging
+		return temp;
 	}
 	
 }
