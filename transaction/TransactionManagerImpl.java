@@ -60,6 +60,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		// Create Log File
 		logFile = RMIName + ".log";
 		logWriter = new LogWriter(logFile);
+		logWriter.loadFile();
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
 		xidCounter = new AtomicInteger(0);
