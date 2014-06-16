@@ -216,7 +216,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		return true;
 	}
 	
-	public State getStatus(int xid){
+	public State getStatus(int xid) throws RemoteException{
 		TransactionDetails details = transactions.get(xid);
 		if(details == null){
 			return State.ABORTED;

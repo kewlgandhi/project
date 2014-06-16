@@ -22,8 +22,18 @@ After all components fail, previous committed transactions are lost.
   <!-- <test id="FdieTM" fpoints="5">
 After TM fails, transaction is not forcibly aborted.
   </test> -->
-<test id="FdieRMBeforePrepare" fpoints="5">
-dieRMBeforePrepare: transaction is not forcibly aborted.
+
+  <!-- 
+  <test id="FdieTMBeforeCommit" fpoints="5">
+dieTMBeforeCommit: transaction is not forcibly aborted.
+  </test>
+
+  <test id="FdieTMAfterCommit" fpoints="5">
+dieTMAfterCommit: transaction is not committed.
+  </test>
+ -->
+  <test id="FdieRMBeforeCommit" fpoints="5">
+dieRMBeforeCommit: RM does not recover properly.
   </test>
 
 

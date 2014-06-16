@@ -2,6 +2,7 @@ package transaction;
 
 import java.rmi.*;
 import java.util.concurrent.ConcurrentHashMap;
+import transaction.bean.State;
 
 /** 
  * Interface for the Transaction Manager of the Distributed Travel
@@ -30,5 +31,5 @@ public interface TransactionManager extends Remote {
 	public boolean abort(int xid) throws RemoteException;
 	public void setDieTMafterCommit(boolean b) throws RemoteException;
 	public void setDieTMbeforeCommit(boolean b) throws RemoteException;
-
+	public State getStatus(int xid) throws RemoteException;
 }

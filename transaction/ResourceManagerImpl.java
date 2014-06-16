@@ -27,6 +27,7 @@ import transaction.bean.Hotels;
 import transaction.bean.Reservation;
 import transaction.bean.TableWriter;
 import transaction.bean.UndoIMLog;
+import transaction.bean.State;
 import transaction.logmgr.LogWriter;
 import transaction.logmgr.TransactionLogger;
 import transaction.logmgr.VariableLogger;
@@ -474,6 +475,10 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException, 
 			InvalidTransactionException {
+		//TODO : implement dieAfterCommit
+		if(dieBeforeCommit){
+			dieNow();
+		}
 		System.out.println("Committing");
 		// When xid is removed from the hashset , see if the hashset becomes equal to the shuttingDown.get() value -
 		// implies there are no more useful processes left. hence can shutdown the system.
@@ -1858,7 +1863,18 @@ implements ResourceManager {
 		if(recoveryRequired==false){
 			System.out.println("No Need to recover");
 			return;
-		}		
+		}	
+		//TODO : get it reviewed by Kewal
+		for(Integer preparedTxn : prprdTxns.keySet()){
+			try{
+				State status = tm.getStatus(preparedTxn.intValue());
+				if(status == State.PREPARED){
+					comtdTxns.put(preparedTxn, DUMMY);
+				}
+			}catch(RemoteException e){
+				System.out.println("What to do if TM is dead when checking status??");
+			}
+		}	
 		System.out.println("Analyze phase done");
 		if(recoveryManager.redo()==false){
 			System.out.println("Failed during redo");
@@ -1868,6 +1884,9 @@ implements ResourceManager {
 	}
 
 	public boolean prepare(int xid) throws RemoteException {
+		if(dieBeforePrepare){
+			dieNow();
+		}
 		if(abrtdTxns.containsKey(xid)){
 			return false;			
 		}
@@ -1882,6 +1901,9 @@ implements ResourceManager {
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
 		logWriter.flush();
+		if(dieAfterPrepare){
+			dieNow();
+		}
 		return true;
 	}
 
