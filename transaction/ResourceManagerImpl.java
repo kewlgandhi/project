@@ -1849,8 +1849,13 @@ implements ResourceManager {
 	}
 
 	public boolean prepare(int xid) throws RemoteException {
-		// TODO Auto-generated method stub
-		return false;
+		if(abrtdTxns.containsKey(xid)){
+			return false;			
+		}
+		if(!activeTxns.containsKey(xid)){
+			System.out.println("Should not reach here: in prepare");
+		}
+		return true;
 	}
 
 	public String getRMName() throws RemoteException {
