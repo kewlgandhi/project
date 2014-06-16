@@ -343,10 +343,19 @@ public interface ResourceManager extends Remote {
     public boolean dieAfterPointerSwitch() 
 	throws RemoteException;
 
+    public void setDieAfterEnlist(boolean b) throws RemoteException;
+	public void setDieAfterPrepare(boolean b) throws RemoteException;
+	public void setDieBeforePrepare(boolean b) throws RemoteException;
+	public void setDieBeforeCommit(boolean b) throws RemoteException;
+	public void setDieBeforeAbort(boolean b) throws RemoteException;
 
     /** The RMI names a ResourceManager binds to. */
     public static final String RMINameFlights = "RMFlights";
     public static final String RMINameRooms = "RMRooms";
     public static final String RMINameCars = "RMCars";
     public static final String RMINameCustomers = "RMCustomers";
+
+
+
+
 }
