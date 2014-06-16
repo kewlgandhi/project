@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import transaction.WorkflowController;
+import transaction.bean.State;
 import transaction.logmgr.LogReader;
 
 
@@ -68,9 +69,32 @@ public class TMRecoveryManager {
 				String[] xid = nextLine.split("@#@");
 				int XID = Integer.parseInt(xid[0]);
 				inprogressTxns.remove(XID, DUMMY);
-				State logState = Integer.parseInt(xid[3]);
+				if(xid[3].equals("1")){
+					//Initialized 
+					initializedTxns.put(XID, DUMMY);
+				}
+				else if(xid[3].equals("2")){
+					//Prepared
+					initializedTxns.remove(XID);
+					preparedTxns.put(XID, DUMMY);
+				}
+				else if(xid[3].equals("3")){
+					//Committed
+					preparedTxns.remove(XID);
+					committedTxns.put(XID, DUMMY);
+				}
+				else if(xid[3].equals("4")){
+					//Aborted
+					preparedTxns.remove(XID);
+					abortedTxns.put(XID, DUMMY);
+				}
+				else if(xid[3].equals("5")){
+					//COmpleted
+					if(committedTxns.contains(XID))committedTxns.remove(XID);
+					if(abortedTxns.contains(XID))committedTxns.remove(XID);
+					completedTxns.put(XID, DUMMY);
+				}	
 			}
-
 		}
 	}
 
