@@ -24,9 +24,7 @@ public interface TransactionManager extends Remote {
 	public void enlist(int xid, ResourceManagerImpl resourceManagerImpl) throws RemoteException;
 
 
-	public ConcurrentHashMap<Integer, Object> getActiveTxns();
-
-
+	public ConcurrentHashMap<Integer, Object> getActiveTxns() throws RemoteException;
 	public int start() throws RemoteException;
 	public boolean commit(int xid) throws RemoteException;
 	public boolean abort(int xid) throws RemoteException;
