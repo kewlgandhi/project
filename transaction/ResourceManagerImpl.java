@@ -1452,8 +1452,10 @@ implements ResourceManager {
 			TransactionAbortedException,
 			InvalidTransactionException {
 
-		if(custName==null)
+		if(custName==null){
+			System.out.println("Customer name is: "+custName);
 			return 0;
+		}
 		int customerBill = 0;
 		try{
 			// Acquire Lock
@@ -1465,6 +1467,7 @@ implements ResourceManager {
 
 			//Check if customer exists
 			if(!reservationTable.containsKey(custName)){
+				
 				return 0;
 			}
 			//Over Here Customer exists

@@ -6,19 +6,19 @@ rm -rf */*.class
 rm -f ../test.part2/results/*
 
 make runregistry &
-sleep 5
+sleep 3
 make runtm &
-sleep 5
+sleep 3
 make runrmflights &
-sleep 5
+sleep 3
 make runrmrooms &
-sleep 5
+sleep 3
 make runrmcars &
-sleep 5
+sleep 3
 make runrmcustomers &
-sleep 5
+sleep 3
 make runwc &
-sleep 5
+sleep 3
 make client &
 
 cd ../test.part2

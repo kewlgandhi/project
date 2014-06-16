@@ -18,20 +18,16 @@
   <!-- Basic tests -->
 
 
-  <test id="Bstcmt" fpoints="100" fnext="_END_">
-Cannot commit a non-op transaction.
+  <test id="Sbill">
+Does not compute correct bill.
   </test>
 
-  <test id="Bstabt" fpoints="100" fnext="_END_">
-Cannot abort a non-op transaction.
+  <test id="Siticmt">
+query result incorrect after reserveItinerary commits.
   </test>
 
-  <test id="Badd" fpoints="100" fnext="_END_">
-Cannot add flight/rooms/cars/customer.
-  </test>
-
-  <test id="Baddcmt" fpoints="100" fnext="_END_">
-commit fails after adding flight/rooms/cars/customer.
+  <test id="Sitiabt">
+query result incorrect after reserveItinerary aborts.
   </test>
 
 
