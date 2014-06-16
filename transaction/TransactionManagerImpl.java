@@ -82,6 +82,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	}
 	
 	public boolean commit(int xid){
+		System.out.println("In transaction manager COMMIt");
 		TransactionDetails details = transactions.get(xid);
 		StringBuilder logMsg = new StringBuilder("");
 		if(details == null){
@@ -104,6 +105,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		for(ResourceManager rm : rmList){
 			try{
 				allAreReady = allAreReady && rm.prepare(xid);
+				System.out.println(rm.getRMName() + ": " +allAreReady);
 			}catch(RemoteException e){
 				allAreReady = false;
 			}

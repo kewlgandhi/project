@@ -135,6 +135,7 @@ implements WorkflowController {
 			InvalidTransactionException {
 		System.out.println("Calling commit  at WC");
 		isValidTrxn(xid);
+		System.out.println("Xid is Valid");
 		boolean returnVal;
 		try{
 			returnVal = tm.commit(xid);
