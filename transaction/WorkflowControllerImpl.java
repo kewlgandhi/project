@@ -507,7 +507,9 @@ implements WorkflowController {
 		isValidTrxn(xid);
 		int returnVal = 0;
 		try{
-			returnVal = (rmCustomers.queryCustomerBill(xid, custName));
+			returnVal = (rmFlights.queryCustomerBill(xid, custName));
+			returnVal += (rmCars.queryCustomerBill(xid, custName));
+			returnVal += (rmRooms.queryCustomerBill(xid, custName));
 		}
 		catch(RemoteException e)
 		{
@@ -602,13 +604,13 @@ implements WorkflowController {
 		try{
 
 			for(Object flightNum: flightNumList)
-				result&=rmFlights.reserveFlight(xid, custName,(String) flightNum);
+				result = result && rmFlights.reserveFlight(xid, custName,(String) flightNum);
 
 			if(needCar)
-				result&=rmCars.reserveCar(xid, custName, location);
+				result = result && rmCars.reserveCar(xid, custName, location);
 
 			if(needRoom)
-				result&=rmRooms.reserveRoom(xid, custName, location);
+				result = result && rmRooms.reserveRoom(xid, custName, location);
 		}
 		catch(RemoteException e)
 		{
