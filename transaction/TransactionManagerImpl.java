@@ -56,11 +56,14 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 
 
 	public TransactionManagerImpl() throws RemoteException {
+		System.out.println("TM constructor start");
 		transactions = new HashMap<Integer, TransactionDetails>();
 		// Create Log File
 		logFile = RMIName + ".log";
+		System.out.println("Creating Log file " + logFile);
 		logWriter = new LogWriter(logFile);
 		logWriter.loadFile();
+		System.out.println("Created LogFile");
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
 		xidCounter = new AtomicInteger(0);
@@ -84,6 +87,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	public boolean commit(int xid){
 		System.out.println("In transaction manager COMMIt");
 		TransactionDetails details = transactions.get(xid);
+		System.out.println("Transaction details is " + details.toString());
 		StringBuilder logMsg = new StringBuilder("");
 		if(details == null){
 			//TODO: what to do?
@@ -237,6 +241,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 
 	public int start() {
 		int temp;
+		System.out.println("TM start started");
 		synchronized (xidCounter) {
 			temp = xidCounter.intValue();
 			xidCounter.set(xidCounter.get()+1);
