@@ -48,7 +48,7 @@ implements ResourceManager {
 
 	// Constants
 	// Other Variables
-	private final Object DUMMY = null;
+	private final Object DUMMY = new Object();
 	private final int WRITE = 1;
 	private final int READ = 0;
 	private final int CHECKPOINT_TRIGGER = 10;
