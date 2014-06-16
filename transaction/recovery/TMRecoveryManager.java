@@ -6,54 +6,77 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import transaction.WorkflowController;
+import transaction.logmgr.LogReader;
+
+
+//TODO
+//CHANGE RECOVERYMANAGER CALL IN RMIMPL
+// GETRMINSTANCE IN WC
 public class TMRecoveryManager {
 
-    public static final String logFile = "TM.log";
-    private BufferedReader fr;
-	private ConcurrentHashMap<Integer, Object> comtdTxns;
-	private ConcurrentHashMap<Integer, Object> abrtdTxns;
-	private ConcurrentHashMap<Integer, Object> ongngTxns;
-	private ConcurrentHashMap<Integer, Object> prprdTxns;
-    
-	public void loadFile() throws FileNotFoundException{
-		System.out.println("Trying to load TM logs");
-		fr = new BufferedReader(new FileReader("./data/"+logFile));
-		if(fr == null){
-			System.out.println("fr is null");
-		}
-		System.out.println("TM Redo logs loaded: "+logFile);
-	}
+	private String logFile;
+	LogReader logReader;
+	private final Object DUMMY = new Object();
+	private WorkflowController wc = null;
 
-	public String nextLine(){
-		String line = null;
-		try {
-			line = fr.readLine();
-		} catch (IOException e) {
-			System.out.println("Error in writing the TM logs "+logFile);
-		}
-		return line;
-	}
+	private ConcurrentHashMap<Integer, Object> inprogressTxns;
+	private ConcurrentHashMap<Integer, Object> initializedTxns;
+	private ConcurrentHashMap<Integer, Object> preparedTxns;
+	private ConcurrentHashMap<Integer, Object> committedTxns;
+	private ConcurrentHashMap<Integer, Object> abortedTxns;
+	private ConcurrentHashMap<Integer, Object> completedTxns;
 
 
-	public void close(){
-		try {
-			fr.close();
-		} catch (IOException e) {
-			System.out.println("Error in closing the TM log file "+logFile);
-		}
+	public TMRecoveryManager(String fileName, WorkflowController wc){
+		logFile = fileName;
+		logReader = new LogReader(logFile);
+		this.wc = wc;
 	}
-	
-	public TMRecoveryManager(){
-		
-	}
-	
+
 	public void analyzeTMlogs(){
-		
+		// Load Undo Redo Logs
+		inprogressTxns = new ConcurrentHashMap<Integer, Object>();
+		initializedTxns = new ConcurrentHashMap<Integer, Object>();
+		preparedTxns = new ConcurrentHashMap<Integer, Object>();
+		committedTxns = new ConcurrentHashMap<Integer, Object>();
+		abortedTxns = new ConcurrentHashMap<Integer, Object>();
+		completedTxns = new ConcurrentHashMap<Integer, Object>();
+
+		try {
+			logReader.loadFile();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("RedoTmLog not found in analyze Tmlog");
+			e.printStackTrace();
+		}
+		System.out.println("Loaded undo-redo log file");
+		// Create HashSet of Committed Transactions
+		String nextLine = logReader.nextLine();
+		if(nextLine==null){
+			System.out.println("File Empty, No recovery required !");
+			return;
+		}
+
+		while(nextLine != null){
+			if(nextLine.contains("INSERT")){
+				String[] xid = nextLine.split("@#@");
+				int XID = Integer.parseInt(xid[0]);
+				inprogressTxns.put(XID, DUMMY);
+			}
+			else if(nextLine.contains("STATUS")){
+				String[] xid = nextLine.split("@#@");
+				int XID = Integer.parseInt(xid[0]);
+				inprogressTxns.remove(XID, DUMMY);
+				State logState = Integer.parseInt(xid[3]);
+			}
+
+		}
 	}
-	
+
 	public void recoverTM(){
-		
+
 	}
-	
-	
+
+
 }

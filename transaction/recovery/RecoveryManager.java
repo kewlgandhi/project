@@ -23,7 +23,7 @@ public class RecoveryManager {
 	private ConcurrentHashMap<Integer, Object> ongngTxns;
 	private ConcurrentHashMap<Integer, Object> prprdTxns;
 	
-	private final Object DUMMY = null;
+	private final Object DUMMY = new Object();
 	
 	private int MAXid = 0;
 	private String logFile;
@@ -77,7 +77,6 @@ public class RecoveryManager {
 
 		while(nextLine != null){
 			if(nextLine.contains("COMMIT")){
-				System.out.println("I see a commit");
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
 				comtdTxns.put(XID, DUMMY);
@@ -88,7 +87,8 @@ public class RecoveryManager {
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
 				abrtdTxns.put(XID,DUMMY);
-				prprdTxns.remove(XID);
+				if(prprdTxns.contains(XID));
+					prprdTxns.remove(XID);
 				MAXid = (XID>MAXid)?XID:MAXid;
 			}
 			else if(nextLine.contains("PREPARE")){
