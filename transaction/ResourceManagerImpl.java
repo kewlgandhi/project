@@ -1427,7 +1427,7 @@ implements ResourceManager {
 		String lockString = "Cars."+location;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1438,11 +1438,11 @@ implements ResourceManager {
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 	}
