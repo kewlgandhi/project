@@ -34,11 +34,11 @@ public class TransactionDetails {
 		this.rmList = rmList;
 	}
 
-	public void addToRmList(ResourceManagerImpl rm){
+	public void addToRmList(ResourceManager rm){
 		this.rmList.add(rm);
 	}
 	
-	public boolean rmListContains(ResourceManagerImpl rm){
+	public boolean rmListContains(ResourceManager rm){
 		return this.rmList.contains(rm);
 	}
 

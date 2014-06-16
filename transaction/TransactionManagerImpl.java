@@ -75,7 +75,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		if(!details.rmListContains(rm)){
 			details.addToRmList(rm);
-			logMsg.append(xid+"@#@").append("Transactions@#@ADD@#@").append(rm.myRMIName).append("\n");
+			logMsg.append(xid+"@#@").append("Transactions@#@ADD@#@").append(rm.getRMName()).append("\n");
 			transactions.put(xid, details);
 		}
 		executor.submit(new VariableLogger(logMsg.toString(), logWriter));
@@ -99,9 +99,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		logMsg = new StringBuilder("");
 		//End of Logging
-		List<ResourceManagerImpl> rmList = details.getRmList();
+		List<ResourceManager> rmList = details.getRmList();
 		boolean allAreReady = true;
-		for(ResourceManagerImpl rm : rmList){
+		for(ResourceManager rm : rmList){
 			try{
 				allAreReady = allAreReady && rm.prepare(xid);
 			}catch(RemoteException e){
@@ -122,7 +122,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			}
 			logMsg = new StringBuilder("");
 			//End of Logging
-			for(ResourceManagerImpl rm : rmList){
+			for(ResourceManager rm : rmList){
 				try{
 					allCommitted = allCommitted && rm.commit(xid);
 				}catch(RemoteException e){
@@ -179,7 +179,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		logMsg = new StringBuilder("");
 		//End of Logging
 		boolean allAborted = true;
-		for(ResourceManagerImpl rm : details.getRmList()){
+		for(ResourceManager rm : details.getRmList()){
 			try{
 				rm.abort(xid);
 			}catch(RemoteException e){

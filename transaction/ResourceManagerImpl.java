@@ -1852,6 +1852,11 @@ implements ResourceManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public String getRMName() {
+		return myRMIName;
+	}
 }
 // TM INTERFACE
 /*	public void register(int xid){
