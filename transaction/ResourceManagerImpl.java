@@ -202,13 +202,14 @@ implements ResourceManager {
 		callables.add(new TableWriter((Object)reservedflights,"reservedFlights"));
 		checkPointers = Executors.newFixedThreadPool(5); 
 
+		// Check for data directory
+		checkAndCreateData();
+
 		// Create Log File
 		logFile = myRMIName + ".log";
 		logWriter = new LogWriter(logFile);
 		logWriter.loadFile();
 
-		// Check for data directory
-		checkAndCreateData();
 
 		try{
 			loadFiles();

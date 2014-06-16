@@ -1,5 +1,9 @@
 package transaction;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.*;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +62,8 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	public TransactionManagerImpl() throws RemoteException {
 		System.out.println("TM constructor start");
 		transactions = new HashMap<Integer, TransactionDetails>();
+		// Check for data directory
+		checkAndCreateData();
 		// Create Log File
 		logFile = RMIName + ".log";
 		System.out.println("Creating Log file " + logFile);
@@ -264,6 +270,16 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 
 	public ConcurrentHashMap<Integer, Object> getActiveTxns() {
 		return activeTxns;
+	}
+	
+	void checkAndCreateData()
+	{
+		Path path = Paths.get("data");
+		if(Files.notExists(path	))
+		{
+			File dir= new File("data");
+			dir.mkdir();
+		}
 	}
 	
 }
