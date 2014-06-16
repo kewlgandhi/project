@@ -21,7 +21,7 @@ public interface TransactionManager extends Remote {
     public static final String RMIName = "TM";
 
 
-	public void enlist(int xid, ResourceManagerImpl resourceManagerImpl) throws RemoteException;
+	public void enlist(int xid, ResourceManager resourceManager) throws RemoteException;
 
 
 	public ConcurrentHashMap<Integer, Object> getActiveTxns() throws RemoteException;

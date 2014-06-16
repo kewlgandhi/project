@@ -3,18 +3,19 @@ package transaction.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import transaction.ResourceManager;
 import transaction.ResourceManagerImpl;
 
 public class TransactionDetails {
 	
 	
 	private int xid;
-	private List<ResourceManagerImpl> rmList;
+	private List<ResourceManager> rmList;
 	private State status;
 	
 	public TransactionDetails(int xid){
 		this.xid = xid;
-		rmList = new ArrayList<ResourceManagerImpl>();
+		rmList = new ArrayList<ResourceManager>();
 	}
 	
 	public void setStatus(State status){
@@ -25,11 +26,11 @@ public class TransactionDetails {
 		return status;
 	}
 
-	public List<ResourceManagerImpl> getRmList() {
+	public List<ResourceManager> getRmList() {
 		return rmList;
 	}
 
-	public void setRmList(List<ResourceManagerImpl> rmList) {
+	public void setRmList(List<ResourceManager> rmList) {
 		this.rmList = rmList;
 	}
 

@@ -66,7 +66,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		xidCounter = new AtomicInteger(0);
 	}
 	
-	public void enlist(int xid, ResourceManagerImpl rm){
+	public void enlist(int xid, ResourceManager rm){
 		TransactionDetails details = transactions.get(xid);
 		StringBuilder logMsg = new StringBuilder("");
 		if(details == null){
