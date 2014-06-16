@@ -72,7 +72,8 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		System.out.println("Created LogFile");
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
-		xidCounter = new AtomicInteger(0);
+		xidCounter = new AtomicInteger(1);
+		System.out.println("TM constructor end");
 	}
 	
 	public void enlist(int xid, ResourceManager rm) throws RemoteException{
@@ -91,9 +92,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	}
 	
 	public boolean commit(int xid){
-		System.out.println("In transaction manager COMMIt");
+		System.out.println("In transaction manager COMMIT");
 		TransactionDetails details = transactions.get(xid);
-		System.out.println("Transaction details is " + details.toString());
+		//System.out.println("Transaction details is " + details.toString());
 		StringBuilder logMsg = new StringBuilder("");
 		if(details == null){
 			//TODO: what to do?
@@ -252,6 +253,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			temp = xidCounter.intValue();
 			xidCounter.set(xidCounter.get()+1);
 			activeTxns.put(temp, new Object());
+			transactions.put(temp, new TransactionDetails(temp));
 		}
 		StringBuilder logMsg = new StringBuilder("");
 		//Logging
@@ -263,6 +265,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}catch(Exception e){
 			System.out.println("Error in writing log in 2PC");
 		}
+		System.out.println("TM start ended");
 		//End of logging
 		return temp;
 	}

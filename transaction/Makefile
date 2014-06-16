@@ -5,13 +5,10 @@ all : server client
 
 server : ResourceManager.class \
          ResourceManagerImpl.class \
-         ResourceManagerImpl_Stub.class \
          TransactionManager.class \
          TransactionManagerImpl.class \
-         TransactionManagerImpl_Stub.class \
          WorkflowController.class \
          WorkflowControllerImpl.class \
-         WorkflowControllerImpl_Stub.class \
          InvalidTransactionException.class \
          TransactionAbortedException.class
 

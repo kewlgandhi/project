@@ -180,6 +180,8 @@ implements ResourceManager {
 
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
 		abrtdTxns = new ConcurrentHashMap<Integer, Object>();
+		comtdTxns = new ConcurrentHashMap<Integer, Object>();
+		prprdTxns = new ConcurrentHashMap<Integer, Object>();
 
 		flightTable = new ConcurrentHashMap<String, Flight>();
 		carTable = new ConcurrentHashMap<String, Car>();
@@ -232,19 +234,21 @@ implements ResourceManager {
 
 	public void isRegistered(int xid)
 			throws InvalidTransactionException, TransactionAbortedException, RemoteException{
+		System.out.println("ResourceManager: isRegistered started");
 		if(abrtdTxns.containsKey(xid)){
 			throw new TransactionAbortedException(xid,"isRegistered: "+ myRMIName );
 		}
-
+		System.out.println("ResourceManager: Done checking in abrtdTxns");
 		if(comtdTxns.containsKey(xid)){
 			System.out.println("Should Not Reach Here, isRegistered: "+myRMIName);
 			throw new InvalidTransactionException(xid, "");
 		}
-
+		System.out.println("ResourceManager: Done checking in comtdTxns");
 		if(activeTxns.containsKey(xid))
 			return;
-
+		System.out.println("ResourceManager: Done checking in activeTxns");
 		start(xid);
+		System.out.println("ResourceManager: isRegistered ended");
 		return;
 
 	}
@@ -654,10 +658,15 @@ implements ResourceManager {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		System.out.println("ResourceManager: entered addFlight");
 		String lockString = "Flight."+flightNum;
 
+		System.out.println("ResourceManager: about to check validity");
 		//Check if valid XID
 		isRegistered(xid);
+		System.out.println("ResourceManager: done checking validity of transaction");
+
+		
 
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){

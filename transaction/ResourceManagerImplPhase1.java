@@ -620,10 +620,13 @@ extends java.rmi.server.UnicastRemoteObject
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+				System.out.println("ResourceManager: entered addFlight");
 		String lockString = "Flight."+flightNum;
 
 		//Check if valid XID
+		System.out.println("ResourceManager: about to check validity");
 		isValidTrxn(xid);
+		System.out.println("ResourceManager: done checking validity of transaction");
 
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
