@@ -349,7 +349,7 @@ public interface ResourceManager extends Remote {
 	public void setDieBeforeCommit(boolean b) throws RemoteException;
 	public void setDieBeforeAbort(boolean b) throws RemoteException;
 	public boolean prepare(int xid) throws RemoteException;
-	public String getRMName();
+	public String getRMName() throws RemoteException;
 
     /** The RMI names a ResourceManager binds to. */
     public static final String RMINameFlights = "RMFlights";

@@ -1853,8 +1853,7 @@ implements ResourceManager {
 		return false;
 	}
 
-	@Override
-	public String getRMName() {
+	public String getRMName() throws RemoteException {
 		return myRMIName;
 	}
 }
