@@ -672,12 +672,12 @@ implements ResourceManager {
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
 				// Abort and then throw transaction aborted exception
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + flightNum);
 			}
 		} catch (DeadlockException e) {
 			// Handle DeadLock !
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
@@ -749,11 +749,11 @@ implements ResourceManager {
 
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + flightNum);
 			}
 		} catch (DeadlockException e) {
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
@@ -802,7 +802,7 @@ implements ResourceManager {
 				return false;
 			String lockString = "Hotels."+location;
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 			//<----------UNDOING--------------------->
@@ -854,12 +854,12 @@ implements ResourceManager {
 			executor.execute(new VariableLogger(logMsg.toString(), logWriter));
 			return true;	
 		}catch (DeadlockException e) {
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 
@@ -924,12 +924,12 @@ implements ResourceManager {
 			return true;
 
 		}catch (DeadlockException e) {
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
-			abort(xid);
+			tm.abort(xid);
 			e.printStackTrace();
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 
@@ -948,7 +948,7 @@ implements ResourceManager {
 		StringBuilder logMsg = new StringBuilder("");
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -997,12 +997,12 @@ implements ResourceManager {
 
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Transaction aborted for unknown reasons" + "MSG: " + e.getMessage());
 		}
 		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
@@ -1018,7 +1018,7 @@ implements ResourceManager {
 		StringBuilder logMsg = new StringBuilder("");
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1047,11 +1047,11 @@ implements ResourceManager {
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 		executor.execute(new VariableLogger(logMsg.toString(), logWriter));
@@ -1091,12 +1091,12 @@ implements ResourceManager {
 
 		}catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 		return true;
@@ -1113,7 +1113,7 @@ implements ResourceManager {
 			// Acquire Lock
 			String lockString = "Reservations." + custName;
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1136,7 +1136,7 @@ implements ResourceManager {
 				case 1:
 					lockString = "Flight." + key;
 					if(lockManager.lock(xid, lockString, WRITE) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					// Reduce number of seats reserved in reserved flights
@@ -1166,7 +1166,7 @@ implements ResourceManager {
 				case 2:
 					lockString = "Hotels." + key;
 					if(lockManager.lock(xid, lockString, WRITE) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					// Increase number of rooms available in that particular Hotel Location
@@ -1184,7 +1184,7 @@ implements ResourceManager {
 				case 3:
 					lockString = "Cars." + key;
 					if(lockManager.lock(xid, lockString, WRITE) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					// Increase number of cars available in that particular Car location
@@ -1214,12 +1214,12 @@ implements ResourceManager {
 
 		}catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 		return true;
@@ -1241,12 +1241,12 @@ implements ResourceManager {
 		String lockString = "Flight."+flightNum;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		if(!flightTable.containsKey(flightNum)){
@@ -1270,12 +1270,12 @@ implements ResourceManager {
 		String lockString = "Flight."+flightNum;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		if(!flightTable.containsKey(flightNum)){
@@ -1314,7 +1314,7 @@ implements ResourceManager {
 		try{
 			String lockString = "Hotels."+location;
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 			int numAvail =0;
@@ -1326,12 +1326,12 @@ implements ResourceManager {
 			return numAvail;	
 		}catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 
@@ -1365,7 +1365,7 @@ implements ResourceManager {
 		try{
 			String lockString = "Hotels."+location;
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 			int price =0;
@@ -1377,12 +1377,12 @@ implements ResourceManager {
 			return price;	
 		}catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 	}
@@ -1399,7 +1399,7 @@ implements ResourceManager {
 		String lockString = "Cars."+location;
 		try {
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1410,11 +1410,11 @@ implements ResourceManager {
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		} catch (Exception e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 	}
@@ -1461,7 +1461,7 @@ implements ResourceManager {
 			// Acquire Lock
 			String lockString = "Reservations." + custName;
 			if(lockManager.lock(xid, lockString, READ) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1479,7 +1479,7 @@ implements ResourceManager {
 				case 1:
 					lockString = "Flight." + key;
 					if(lockManager.lock(xid, lockString, READ) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					customerBill += flightTable.get(key).getPrice();
@@ -1487,7 +1487,7 @@ implements ResourceManager {
 				case 2:
 					lockString = "Hotels." + key;
 					if(lockManager.lock(xid, lockString, READ) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					customerBill += hotelTable.get(key).getPrice();
@@ -1495,7 +1495,7 @@ implements ResourceManager {
 				case 3:
 					lockString = "Cars." + key;
 					if(lockManager.lock(xid, lockString, READ) == false){
-						abort(xid);
+						tm.abort(xid);
 						throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 					}
 					customerBill += carTable.get(key).getPrice();
@@ -1507,12 +1507,12 @@ implements ResourceManager {
 
 		}catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 		return customerBill;
@@ -1530,18 +1530,18 @@ implements ResourceManager {
 		String lockString = "Flight." + flightNum;
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString); 	
 			}
 			lockString = "Reservations."+custName;
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		if(!flightTable.containsKey(flightNum)){
@@ -1634,17 +1634,17 @@ implements ResourceManager {
 		String lockString = "Cars." + location;
 		try {
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 			lockString = "Reservations."+custName;
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 		} catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		int numCarsAvail = 0;
@@ -1708,12 +1708,12 @@ implements ResourceManager {
 			String lockString = "Hotels." + location;
 
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 			lockString = "Reservations."+custName;
 			if(lockManager.lock(xid, lockString, WRITE) == false){
-				abort(xid);
+				tm.abort(xid);
 				throw new TransactionAbortedException(xid, "Lock Manager returned false while acquiring lock on: " + lockString);
 			}
 
@@ -1769,12 +1769,12 @@ implements ResourceManager {
 		}
 		catch (DeadlockException e) {
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because deadlock detected for XID: "+xid);
 		}
 		catch( Exception e)	{
 			e.printStackTrace();
-			abort(xid);
+			tm.abort(xid);
 			throw new TransactionAbortedException(xid, "Aborted transaction because 'Other' Exception found: "+xid);
 		}
 	}
