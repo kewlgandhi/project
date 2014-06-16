@@ -129,6 +129,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		boolean allCommitted = true;
 		if(allAreReady){
+			if(dieTMbeforeCommit){
+				dieNow();
+			}
 			details.setStatus(State.PREPARED);
 			//Logging
 			logMsg.append(xid+"@#@").append("Transactions@#@STATUS@#@").append(State.PREPARED.toString()+"\n");
@@ -141,6 +144,9 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			}
 			logMsg = new StringBuilder("");
 			//End of Logging
+			if(dieTMafterCommit){
+					dieNow();
+			}
 			for(ResourceManager rm : rmList){
 				try{
 					allCommitted = allCommitted && rm.commit(xid);
@@ -166,7 +172,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				}
 				logMsg = new StringBuilder("");
 				//End of Logging
-				
+
 			}
 			
 		}else{

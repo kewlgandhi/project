@@ -421,6 +421,9 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			//TODO : is this right? Should we do it for every method?
+			e.printStackTrace();
+			throw e;
 		}
 		
 		return returnVal;
