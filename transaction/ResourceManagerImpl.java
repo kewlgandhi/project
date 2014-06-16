@@ -1598,7 +1598,7 @@ implements ResourceManager {
 			reservedflights.put(flightNum,1);
 
 			//<----------UNDOING--------------------->
-			logRec = new UndoIMLog(FlightTable,insert,null,flightNum,null);
+			logRec = new UndoIMLog(Flights,insert,null,flightNum,null);
 			//<----------UNDOING--------------------->
 		}
 		else
@@ -1606,7 +1606,7 @@ implements ResourceManager {
 
 			//<----------UNDOING--------------------->
 			Integer num=(Integer)reservedflights.get(flightNum);
-			logRec = new UndoIMLog(FlightTable,overWrite,num,flightNum,null);
+			logRec = new UndoIMLog(Flights,overWrite,num,flightNum,null);
 			//<----------UNDOING--------------------->
 
 			reservedflights.put(flightNum, num+1);
