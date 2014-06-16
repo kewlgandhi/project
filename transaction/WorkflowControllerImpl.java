@@ -606,7 +606,25 @@ implements WorkflowController {
 		boolean result=true;
 		isValidTrxn(xid);
 		try{
+			int avail = 0;
+			for(Object flightNum: flightNumList){
+				avail =  rmFlights.queryFlight(xid, (String) flightNum);
+				if(avail < 1)
+					return false;
+			}
+			
+			if(needCar){
+				avail = rmCars.queryCars(xid, location);
+				if(avail < 1)
+					return false;
+			}
 
+			if(needRoom){
+				avail = rmRooms.queryCars(xid, location);
+				if(avail < 1)
+					return false;
+			}
+			
 			for(Object flightNum: flightNumList)
 				result = result && rmFlights.reserveFlight(xid, custName,(String) flightNum);
 
