@@ -5,16 +5,16 @@ import java.io.IOException;
 
 public class LogWriter {
 	
-	private String fileName = null;
+	private String fileName = "Redo";
 	private FileWriter fw;
 
 	
 	public LogWriter(String fileName){
-		this.fileName = fileName;
+		this.fileName += fileName;
 	}
 	
 	//TODO : where are we calling this??
-	public void loadFile(){
+	public synchronized void loadFile(){
 		System.out.println("Creating Redo logs for "+ fileName);
 		try {
 			fw = new FileWriter("./data/"+fileName);
