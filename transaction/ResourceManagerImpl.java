@@ -642,7 +642,7 @@ implements ResourceManager {
 			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
 		}
 		logWriter.flush();
-		abrtdTxns.put(xid, DUMMY);
+		
 		System.out.println(" Aborted");
 
 		try {
@@ -650,6 +650,7 @@ implements ResourceManager {
 		} catch (TransactionAbortedException e) {
 			System.out.println("Transaction aborted while removing in abort");
 		}
+		abrtdTxns.put(xid, DUMMY);
 		return;
 	}
 

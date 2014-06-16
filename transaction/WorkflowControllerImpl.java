@@ -190,7 +190,9 @@ implements WorkflowController {
 			throws RemoteException, 
 			TransactionAbortedException,
 			InvalidTransactionException {
+		System.out.println("WorkflowController : entered addflight");
 		isValidTrxn(xid);
+		System.out.println("Done checking the validity of transaction");
 		boolean returnVal = false;
 		try{
 			returnVal = rmFlights.addFlight(xid, flightNum, numSeats, price);
@@ -507,6 +509,7 @@ implements WorkflowController {
 		isValidTrxn(xid);
 		int returnVal = 0;
 		try{
+		
 			returnVal = (rmCustomers.queryCustomerBill(xid, custName));
 		}
 		catch(RemoteException e)
