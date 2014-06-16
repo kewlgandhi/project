@@ -134,8 +134,9 @@ implements WorkflowController {
 			TransactionAbortedException, 
 			InvalidTransactionException {
 		System.out.println("Calling commit  at WC");
-		isValidTrxn(xid);
-		System.out.println("Xid is Valid");
+		//TODO : Do we need this?
+		//isValidTrxn(xid);
+		// System.out.println("Xid is Valid");
 		boolean returnVal;
 		try{
 			returnVal = tm.commit(xid);
@@ -574,9 +575,12 @@ implements WorkflowController {
 		try{
 			returnVal = (rmRooms.reserveRoom(xid, custName, location));
 		}
-		catch(RemoteException e)
-		{
-		}
+		//TODO : should do for all the methods?
+		//See FdieRMAfterenlist
+		//catch(RemoteException e)
+		//{
+
+		//}
 		catch(TransactionAbortedException e)
 		{
 			tm.abort(xid);

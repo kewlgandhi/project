@@ -26,7 +26,7 @@ public interface TransactionManager extends Remote {
 
 	public ConcurrentHashMap<Integer, Object> getActiveTxns() throws RemoteException;
 	public int start() throws RemoteException;
-	public boolean commit(int xid) throws RemoteException;
+	public boolean commit(int xid) throws RemoteException,TransactionAbortedException;
 	public boolean abort(int xid) throws RemoteException;
 	public void setDieTMafterCommit(boolean b) throws RemoteException;
 	public void setDieTMbeforeCommit(boolean b) throws RemoteException;

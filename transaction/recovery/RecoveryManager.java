@@ -79,6 +79,7 @@ public class RecoveryManager {
 			if(nextLine.contains("COMMIT")){
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
+				System.out.println("I see a commit " + XID);
 				comtdTxns.put(XID, DUMMY);
 				prprdTxns.remove(XID);
 				MAXid = (XID>MAXid)?XID:MAXid;
@@ -87,13 +88,14 @@ public class RecoveryManager {
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
 				abrtdTxns.put(XID,DUMMY);
-				if(prprdTxns.contains(XID));
+				if(prprdTxns.containsKey(XID));
 					prprdTxns.remove(XID);
 				MAXid = (XID>MAXid)?XID:MAXid;
 			}
 			else if(nextLine.contains("PREPARE")){
 				String[] xid = nextLine.split(" ");
 				int XID = Integer.parseInt(xid[0]);
+				System.out.println("I see a prepare " + XID);
 				ongngTxns.remove(XID);
 				prprdTxns.put(XID, DUMMY);
 			}
@@ -106,6 +108,9 @@ public class RecoveryManager {
 			nextLine = logReader.nextLine();
 		}
 		abrtdTxns.putAll(ongngTxns);
+		System.out.println("After redo ... ");
+		System.out.println("Committed Transactions size : " + comtdTxns.size());
+		System.out.println("Aborted Transactions size : " + abrtdTxns.size());
 		if(comtdTxns.size()==0)return false;
 		logReader.close();
 		return true;
@@ -117,13 +122,15 @@ public class RecoveryManager {
 		String nextLine = logReader.nextLine();
 		while(nextLine != null){
 			// The Log is commit, abort or start
+			System.out.println("REDO log : " + nextLine);
 			if(!nextLine.contains("@#@")){
 				nextLine = logReader.nextLine();
 				continue;
 			}
 			String[] xid = nextLine.split("@#@");
+
 			// The transaction is not committed. No need to redo(unod has handled it)
-			if(!comtdTxns.contains(Integer.parseInt(xid[0]))){
+			if(!comtdTxns.containsKey(Integer.parseInt(xid[0]))){
 				nextLine = logReader.nextLine();
 				continue;
 			}
@@ -157,6 +164,7 @@ public class RecoveryManager {
 
 			// REDO for Cars
 			else if(xid[1].equals("Cars")){
+				System.out.println("REDO log : " + nextLine);
 				if(xid[3].equals("")){
 					if(xid[4].equals("INSERT")){
 						redoCar.insert(xid[2]);

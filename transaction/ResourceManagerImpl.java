@@ -235,21 +235,22 @@ implements ResourceManager {
 
 	public void isRegistered(int xid)
 			throws InvalidTransactionException, TransactionAbortedException, RemoteException{
-		System.out.println("ResourceManager: isRegistered started");
+		// System.out.println("ResourceManager: isRegistered started");
+		// System.out.println("xid is: " + xid);
 		if(abrtdTxns.containsKey(xid)){
 			throw new TransactionAbortedException(xid,"isRegistered: "+ myRMIName );
 		}
-		System.out.println("ResourceManager: Done checking in abrtdTxns");
+		// System.out.println("ResourceManager: Done checking in abrtdTxns");
 		if(comtdTxns.containsKey(xid)){
 			System.out.println("Should Not Reach Here, isRegistered: "+myRMIName);
 			throw new InvalidTransactionException(xid, "");
 		}
-		System.out.println("ResourceManager: Done checking in comtdTxns");
+		// System.out.println("ResourceManager: Done checking in comtdTxns");
 		if(activeTxns.containsKey(xid))
 			return;
-		System.out.println("ResourceManager: Done checking in activeTxns");
+		// System.out.println("ResourceManager: Done checking in activeTxns");
 		start(xid);
-		System.out.println("ResourceManager: isRegistered ended");
+		// System.out.println("ResourceManager: isRegistered ended");
 		return;
 
 	}
@@ -1873,6 +1874,14 @@ implements ResourceManager {
 		if(!activeTxns.containsKey(xid)){
 			System.out.println("Should not reach here: in prepare");
 		}
+		Future returnVal = executor.submit(new TransactionLogger(xid+" " + "PREPARE\n", logWriter));
+		try{
+			returnVal.get();
+		}
+		catch(Exception e){
+			System.out.println("Something hapened while retrieving value of atomic integer retunVal.Lets all zink about zees now"+e.getMessage());
+		}
+		logWriter.flush();
 		return true;
 	}
 

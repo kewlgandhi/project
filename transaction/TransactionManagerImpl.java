@@ -19,6 +19,7 @@ import transaction.bean.TransactionDetails;
 import transaction.logmgr.LogWriter;
 import transaction.logmgr.TransactionLogger;
 import transaction.logmgr.VariableLogger;
+import transaction.TransactionAbortedException;
 
 /** 
  * Transaction Manager for the Distributed Travel Reservation System.
@@ -72,6 +73,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		System.out.println("Created LogFile");
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
+		//TODO : initialize xid counter from MAX in recovery + 1
 		xidCounter = new AtomicInteger(1);
 		System.out.println("TM constructor end");
 	}
@@ -91,13 +93,15 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		executor.submit(new VariableLogger(logMsg.toString(), logWriter));
 	}
 	
-	public boolean commit(int xid){
+	public boolean commit(int xid) throws RemoteException,TransactionAbortedException{
 		System.out.println("In transaction manager COMMIT");
 		TransactionDetails details = transactions.get(xid);
 		//System.out.println("Transaction details is " + details.toString());
 		StringBuilder logMsg = new StringBuilder("");
 		if(details == null){
 			//TODO: what to do?
+			System.out.println("Details is null");
+			throw new TransactionAbortedException(xid, "No details of transaction in the TM");
 		}
 		details.setStatus(State.INITIALIZED);
 		//Logging
@@ -119,6 +123,8 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				System.out.println(rm.getRMName() + ": " +allAreReady);
 			}catch(RemoteException e){
 				allAreReady = false;
+				abort(xid);
+				throw new TransactionAbortedException(xid, "All RMs not ready to commit");
 			}
 		}
 		boolean allCommitted = true;
