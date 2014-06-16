@@ -15,20 +15,28 @@
 
 <tests totalpoints="100">
 
-  <!-- Basic tests -->
-
-
-  <test id="Sbill">
-Does not compute correct bill.
+  <test id="FdieAll" fpoints="5">
+After all components fail, previous committed transactions are lost.
   </test>
 
-  <test id="Siticmt">
-query result incorrect after reserveItinerary commits.
+  <!-- <test id="FdieRM" fpoints="5">
+After RM fails, transaction is not forcibly aborted.
   </test>
 
-  <test id="Sitiabt">
-query result incorrect after reserveItinerary aborts.
+  <test id="FdienpRM" fpoints="5">
+After non-participant RM fails, transaction cannot be committed.
   </test>
 
+  <test id="FdieWC" fpoints="5">
+After WC fails, transaction cannot be committed.
+  </test>
+
+  <test id="FdieTM" fpoints="5">
+After TM fails, transaction is not forcibly aborted.
+  </test>
+
+  <test id="FdieRMAfterEnlist" fpoints="5">
+dieRMAfterEnlist: transaction is not forcibly aborted.
+  </test> -->
 
 </tests>

@@ -620,7 +620,7 @@ implements WorkflowController {
 			}
 
 			if(needRoom){
-				avail = rmRooms.queryCars(xid, location);
+				avail = rmRooms.queryRooms(xid, location);
 				if(avail < 1)
 					return false;
 			}

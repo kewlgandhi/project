@@ -8,10 +8,10 @@ import java.io.IOException;
 public class LogReader {
 
 	private BufferedReader fr;
-	private String fileName;
+	private String fileName = "Redo";
 	
 	public LogReader(String fileName){
-		this.fileName = fileName;
+		this.fileName += fileName;
 	}
 
 	public void loadFile() throws FileNotFoundException{

@@ -207,10 +207,9 @@ implements ResourceManager {
 		// Check for data directory
 		checkAndCreateData();
 
-		// Create Log File
+		// Name the Log File
 		logFile = myRMIName + ".log";
-		logWriter = new LogWriter(logFile);
-		logWriter.loadFile();
+		
 
 
 		try{
@@ -228,7 +227,9 @@ implements ResourceManager {
 			System.out.println("Nothing to recover"+ e.getMessage());
 		}
 		System.out.println("Recovery done: " + myRMIName);
-
+		//create the log file
+		logWriter = new LogWriter(logFile);
+		logWriter.loadFile();
 		System.out.println("Closing constructor: "+ myRMIName);
 	}
 
@@ -400,6 +401,9 @@ implements ResourceManager {
 	public void start(int xid) throws RemoteException {	
 		//Register this RM in TM
 		tm.enlist(xid,this);
+		if(dieAfterEnlist){
+			dieNow();
+		}
 
 		synchronized(enteredTxnsCount){
 			System.out.println("Entering start: "+ myRMIName);
