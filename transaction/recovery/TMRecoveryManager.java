@@ -99,6 +99,13 @@ public class TMRecoveryManager {
 	}
 
 	public void recoverTM(){
+		logReader.loadFile();
+		String nextLine = logReader.nextLine();
+		while(nextLine != null){
+			
+
+				continue;
+			}
 
 	}
 
