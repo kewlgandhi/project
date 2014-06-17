@@ -1,6 +1,7 @@
 package transaction;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import transaction.bean.TransactionDetails;
 import transaction.logmgr.LogWriter;
 import transaction.logmgr.TransactionLogger;
 import transaction.logmgr.VariableLogger;
+import transaction.recovery.TMRecoveryManager;
 import transaction.TransactionAbortedException;
 
 /** 
@@ -301,16 +303,16 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		TMRecoveryManager recoveryManager = new TMRecoveryManager(logFile);
 		System.out.println("Recovery Manager instantiated");
 		boolean recoveryRequired = recoveryManager.analyze();
-		abrtdTxns = recoveryManager.getAbrtdTxns();
-		comtdTxns = recoveryManager.getComtdTxns();
-		prprdTxns = recoveryManager.getPrprdTxns();
-		xidCounter = recoveryManager.getMAXid() + 1;
+		transactions = recoveryManager.getTransactions();
+		xidCounter.set(recoveryManager.getMaxXID()+1);
 
 		if(recoveryRequired==false){
 			System.out.println("No Need to recover");
 			return;
-		}	
+		}
+		
 		//TODO : should we restart the 2PC for INITIALIZED transactions?
+		
 		System.out.println("Analyze phase done");
 		if(recoveryManager.redo()==false){
 			System.out.println("Failed during redo");

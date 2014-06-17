@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
@@ -12,6 +13,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 import transaction.ResourceManager;
 import transaction.WorkflowController;
 import transaction.bean.State;
+import transaction.bean.TransactionDetails;
 import transaction.logmgr.LogReader;
 
 
@@ -123,6 +125,11 @@ public class TMRecoveryManager {
 	
 	public int getMaxXID(){
 		return maxXID;
+	}
+
+	public Map<Integer, TransactionDetails> getTransactions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

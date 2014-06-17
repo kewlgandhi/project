@@ -237,7 +237,6 @@ public class RecoveryManager {
 					if(xid[3].equals("NumReserved")){
 						redoReservedFlights.updateNumReserved(xid[2],Integer.parseInt(xid[5]));
 					}
-
 				}
 			}
 			// Read Next line
