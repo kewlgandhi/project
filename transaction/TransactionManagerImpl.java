@@ -69,14 +69,18 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		checkAndCreateData();
 		// Create Log File
 		logFile = RMIName + ".log";
+		
+		try {
+			recover();
+		} catch (FileNotFoundException e) {
+			System.out.println("TM: Nothing to recover"+ e.getMessage());
+		}
 		System.out.println("Creating Log file " + logFile);
 		logWriter = new LogWriter(logFile);
 		logWriter.loadFile();
 		System.out.println("Created LogFile");
 		executor = Executors.newSingleThreadExecutor();
 		activeTxns = new ConcurrentHashMap<Integer,Object>();
-		//TODO : initialize xid counter from MAX in recovery + 1
-		xidCounter = new AtomicInteger(1);
 		System.out.println("TM constructor end");
 	}
 
