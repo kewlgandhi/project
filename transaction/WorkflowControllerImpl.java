@@ -163,7 +163,7 @@ implements WorkflowController {
 		try{
 			returnVal = tm.abort(xid);
 
-		}catch(Exception ex){
+		}catch(RemoteException ex){
 			activeTxns.remove(xid);
 			throw ex;
 		}
@@ -200,6 +200,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -226,7 +227,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
-
+				throw e;
 		}
 		return returnVal;
 
@@ -255,7 +256,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
-
+			throw e;
 		}
 		return returnVal;
 	}
@@ -284,6 +285,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -311,6 +313,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -338,6 +341,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -364,6 +368,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 
@@ -390,6 +395,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 
 		return returnVal;
@@ -441,6 +447,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -456,6 +463,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -471,6 +479,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 
@@ -487,6 +496,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -502,6 +512,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -521,6 +532,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -550,6 +562,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -565,6 +578,7 @@ implements WorkflowController {
 		}
 		catch(RemoteException e)
 		{
+			throw e;
 		}
 		return returnVal;
 	}
@@ -640,9 +654,6 @@ implements WorkflowController {
 
 			if(needRoom)
 				result = result && rmRooms.reserveRoom(xid, custName, location);
-		}
-		catch(RemoteException e)
-		{
 		}
 		catch(TransactionAbortedException e)
 		{
@@ -725,33 +736,23 @@ implements WorkflowController {
 			throws RemoteException {
 		if (who.equals(TransactionManager.RMIName) ||
 				who.equals("ALL")) {
-			try {
 				tm.dieNow();
-			} catch (RemoteException e) {}
 		}
 		if (who.equals(ResourceManager.RMINameFlights) ||
 				who.equals("ALL")) {
-			try {
 				rmFlights.dieNow();
-			} catch (RemoteException e) {}
 		}
 		if (who.equals(ResourceManager.RMINameRooms) ||
 				who.equals("ALL")) {
-			try {
 				rmRooms.dieNow();
-			} catch (RemoteException e) {}
 		}
 		if (who.equals(ResourceManager.RMINameCars) ||
 				who.equals("ALL")) {
-			try {
 				rmCars.dieNow();
-			} catch (RemoteException e) {}
 		}
 		if (who.equals(ResourceManager.RMINameCustomers) ||
 				who.equals("ALL")) {
-			try {
 				rmCustomers.dieNow();
-			} catch (RemoteException e) {}
 		}
 		if (who.equals(WorkflowController.RMIName) ||
 				who.equals("ALL")) {
