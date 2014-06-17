@@ -42,6 +42,8 @@ public class TMRecoveryManager {
 	public TMRecoveryManager(String fileName){
 		logFile = fileName;
 		logReader = new LogReader(logFile);
+		transactions = new HashMap<Integer, TransactionDetails>();
+
 	}
 
 	public boolean analyze(){
@@ -115,7 +117,6 @@ public class TMRecoveryManager {
 			e.printStackTrace();
 			return false;
 		}
-		transactions = new HashMap<Integer, TransactionDetails>();
 		String nextLine = logReader.nextLine();
 		while(nextLine != null){
 			String[] xid = nextLine.split("@#@");

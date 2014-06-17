@@ -69,7 +69,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		checkAndCreateData();
 		// Create Log File
 		logFile = RMIName + ".log";
-		
+		xidCounter = new AtomicInteger();
 		try {
 			recover();
 		} catch (FileNotFoundException e) {
