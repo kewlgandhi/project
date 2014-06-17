@@ -17,7 +17,7 @@ public class LogWriter {
 	public synchronized void loadFile(){
 		System.out.println("Creating Redo logs for "+ fileName);
 		try {
-			fw = new FileWriter("./data/"+fileName);
+			fw = new FileWriter("./data/"+fileName, true);
 		} catch (IOException e) {
 			System.out.println("Error creating Redo log file "+ fileName);
 			e.printStackTrace();

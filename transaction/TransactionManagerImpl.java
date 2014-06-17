@@ -296,5 +296,27 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			dir.mkdir();
 		}
 	}
+
+	public void recover() throws FileNotFoundException{
+		TMRecoveryManager recoveryManager = new TMRecoveryManager(logFile);
+		System.out.println("Recovery Manager instantiated");
+		boolean recoveryRequired = recoveryManager.analyze();
+		abrtdTxns = recoveryManager.getAbrtdTxns();
+		comtdTxns = recoveryManager.getComtdTxns();
+		prprdTxns = recoveryManager.getPrprdTxns();
+		xidCounter = recoveryManager.getMAXid() + 1;
+
+		if(recoveryRequired==false){
+			System.out.println("No Need to recover");
+			return;
+		}	
+		//TODO : should we restart the 2PC for INITIALIZED transactions?
+		System.out.println("Analyze phase done");
+		if(recoveryManager.redo()==false){
+			System.out.println("Failed during redo");
+			return;
+		}
+		System.out.println("REDO phase done");
+	}
 	
 }
