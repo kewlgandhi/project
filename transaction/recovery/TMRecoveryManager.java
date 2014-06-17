@@ -46,7 +46,7 @@ public class TMRecoveryManager {
 
 	}
 
-	public boolean analyze(){
+	public boolean analyze() throws FileNotFoundException{
 		// Load Undo Redo Logs
 		inprogressTxns = new ConcurrentHashMap<Integer, Object>();
 		initializedTxns = new ConcurrentHashMap<Integer, Object>();
@@ -54,13 +54,7 @@ public class TMRecoveryManager {
 		committedTxns = new ConcurrentHashMap<Integer, Object>();
 		abortedTxns = new ConcurrentHashMap<Integer, Object>();
 
-		try {
-			logReader.loadFile();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("RedoTmLog not found in analyze Tmlog");
-			e.printStackTrace();
-		}
+		logReader.loadFile();
 		System.out.println("Loaded undo-redo log file");
 		// Create HashSet of Committed Transactions
 		String nextLine = logReader.nextLine();
