@@ -69,7 +69,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		checkAndCreateData();
 		// Create Log File
 		logFile = RMIName + ".log";
-		xidCounter = new AtomicInteger();
+		xidCounter = new AtomicInteger(1);
 		try {
 			recover();
 		} catch (FileNotFoundException e) {
@@ -163,6 +163,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 					//TODO: decide what to do
 				}
 			}
+
 			if(allCommitted){
 				details.setStatus(State.COMMITTED);
 				transactions.remove(xid);
@@ -267,13 +268,15 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	public int start() {
 		int temp;
 		System.out.println("TM start started");
+		StringBuilder logMsg = new StringBuilder("");
 		synchronized (xidCounter) {
 			temp = xidCounter.intValue();
 			xidCounter.set(xidCounter.get()+1);
 			activeTxns.put(temp, new Object());
 			transactions.put(temp, new TransactionDetails(temp));
+			logMsg.append(temp+"@#@").append("Transactions@#@INSERT\n");
 		}
-		StringBuilder logMsg = new StringBuilder("");
+		
 		//Logging
 		logMsg.append(temp+"@#@").append("START\n");
 		Future ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
