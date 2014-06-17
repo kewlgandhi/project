@@ -1864,10 +1864,11 @@ implements ResourceManager {
 			System.out.println("No Need to recover");
 			return;
 		}	
-		//TODO : get it reviewed by Kewal
+		System.out.println("Checking status for prepared transactions");
 		for(Integer preparedTxn : prprdTxns.keySet()){
 			try{
 				State status = tm.getStatus(preparedTxn.intValue());
+				System.out.println("Status for txn " + preparedTxn.intValue() + " is " + status);
 				if(status == State.PREPARED){
 					comtdTxns.put(preparedTxn, DUMMY);
 				}

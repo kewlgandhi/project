@@ -278,7 +278,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		
 		//Logging
-		logMsg.append(temp+"@#@").append("START\n");
+		logMsg.append(temp+"@#@").append("START@#@START\n");
 		Future ret = executor.submit(new TransactionLogger(logMsg.toString(), logWriter));
 		try{
 			ret.get();

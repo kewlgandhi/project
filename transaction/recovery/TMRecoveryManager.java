@@ -74,21 +74,21 @@ public class TMRecoveryManager {
 				String[] xid = nextLine.split("@#@");
 				int XID = Integer.parseInt(xid[0]);
 				inprogressTxns.remove(XID, DUMMY);
-				if(xid[3].equals("1")){
+				if(xid[3].equals("INITIALIZED")){
 					//Initialized 
 					initializedTxns.put(XID, DUMMY);
 				}
-				else if(xid[3].equals("2")){
+				else if(xid[3].equals("PREPARED")){
 					//Prepared
 					initializedTxns.remove(XID);
 					preparedTxns.put(XID, DUMMY);
 				}
-				else if(xid[3].equals("3")){
+				else if(xid[3].equals("COMMITTED")){
 					//Committed
 					preparedTxns.remove(XID);
 					committedTxns.put(XID, DUMMY);
 				}
-				else if(xid[3].equals("4")){
+				else if(xid[3].equals("ABORTED")){
 					//Aborted
 					preparedTxns.remove(XID);
 					abortedTxns.put(XID, DUMMY);
