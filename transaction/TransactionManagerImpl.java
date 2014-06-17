@@ -28,7 +28,7 @@ import transaction.TransactionAbortedException;
  */
 
 public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject implements TransactionManager {
-	
+
 	private Map<Integer, TransactionDetails> transactions;
 	protected AtomicInteger xidCounter;
 	private LogWriter logWriter;
@@ -37,7 +37,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	private boolean dieTMbeforeCommit = false;
 	private boolean dieTMafterCommit = false;
 	private ConcurrentHashMap<Integer,Object> activeTxns;
-	
+
 	public static void main(String args[]) {
 		System.setSecurityManager(new RMISecurityManager());
 
@@ -77,7 +77,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		xidCounter = new AtomicInteger(1);
 		System.out.println("TM constructor end");
 	}
-	
+
 	public void enlist(int xid, ResourceManager rm) throws RemoteException{
 		TransactionDetails details = transactions.get(xid);
 		StringBuilder logMsg = new StringBuilder("");
@@ -92,7 +92,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		}
 		executor.submit(new VariableLogger(logMsg.toString(), logWriter));
 	}
-	
+
 	public boolean commit(int xid) throws RemoteException,TransactionAbortedException{
 		System.out.println("In transaction manager COMMIT");
 		TransactionDetails details = transactions.get(xid);
@@ -145,7 +145,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 			logMsg = new StringBuilder("");
 			//End of Logging
 			if(dieTMafterCommit){
-					dieNow();
+				dieNow();
 			}
 			for(ResourceManager rm : rmList){
 				try{
@@ -174,7 +174,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				//End of Logging
 
 			}
-			
+
 		}else{
 			abort(xid);
 			return false;
@@ -182,7 +182,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 		activeTxns.remove(xid);
 		return true;
 	}
-	
+
 	public boolean abort(int xid){
 		TransactionDetails details = transactions.get(xid);
 		StringBuilder logMsg = new StringBuilder("");
@@ -214,14 +214,14 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 				//TODO: decide what to do
 			}
 		}
-		
+
 		activeTxns.remove(xid);
 		if(!allAborted){
 			return false;
 		}
 		return true;
 	}
-	
+
 	public State getStatus(int xid) throws RemoteException{
 		TransactionDetails details = transactions.get(xid);
 		if(details == null){
@@ -286,7 +286,7 @@ public class TransactionManagerImpl extends java.rmi.server.UnicastRemoteObject 
 	public ConcurrentHashMap<Integer, Object> getActiveTxns() {
 		return activeTxns;
 	}
-	
+
 	void checkAndCreateData()
 	{
 		Path path = Paths.get("data");
